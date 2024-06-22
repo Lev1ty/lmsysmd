@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package lmsysmd.dataset.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+service DatasetService {
+  rpc CreateDataset(CreateDatasetRequest) returns (CreateDatasetResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message CreateDatasetRequest {
+  string url = 1 [ 
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true 
+    ];
+}
+
+message CreateDatasetResponse {
+  repeated Dataset dataset = 1;
+}
+
+// Corresponds to one line on https://docs.google.com/spreadsheets/d/1-skT0JRJREJfn5qIQtSwyz2KVHMfLPJy0hOBfjyggZA/edit?gid=0#gid=0
+message Dataset {
+  string model = 1 [ (buf.validate.field).required = true ];
+  string vendor = 2 [ (buf.validate.field).required = true ] ;
+  uint32 param = 3 [ (buf.validate.field).required = true ] ;
+  google.protobuf.Timestamp model_date = 4 [ (buf.validate.field).required = true ] ;
+  string input = 5 [ 
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 2
+  ];
+}
