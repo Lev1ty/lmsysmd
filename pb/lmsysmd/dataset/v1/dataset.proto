@@ -25,7 +25,7 @@ message BatchCreateDatasetResponse {
 
 // Each dataset is grouped by model_id
 message Dataset {
-  uint32 id = 1 [ (buf.validate.field).required = true ];
+  uint32 dataset_id = 1 [ (buf.validate.field).required = true ];
   ModelId model_id = 2 [ (buf.validate.field).required = true ];
   string model_vendor = 3 [ (buf.validate.field).required = true ] ;
   uint32 model_param_count_billion = 4 [ (buf.validate.field).required = true ];
