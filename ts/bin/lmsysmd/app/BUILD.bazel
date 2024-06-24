@@ -7,6 +7,9 @@ js_library(
         "globals.css",
         "layout.tsx",
         "leaderboard/page.tsx",
+        "navbar/brand.tsx",
+        "navbar/index.tsx",
+        "navbar/user.tsx",
         "page.tsx",
         "provider.tsx",
         "rating/id/confirm/loading.tsx",
@@ -20,6 +23,7 @@ js_library(
     deps = [
         "//ts/bin/lmsysmd:node_modules/@clerk/clerk-react",
         "//ts/bin/lmsysmd:node_modules/@clerk/themes",
+        "//ts/bin/lmsysmd:node_modules/@connectrpc/connect",
         "//ts/bin/lmsysmd:node_modules/@connectrpc/connect-query",
         "//ts/bin/lmsysmd:node_modules/@connectrpc/connect-web",
         "//ts/bin/lmsysmd:node_modules/@iconify/react",
@@ -33,6 +37,7 @@ js_library(
         "//ts/bin/lmsysmd:node_modules/next-themes",
         "//ts/bin/lmsysmd:node_modules/nuqs",
         "//ts/bin/lmsysmd:node_modules/react",
+        "//ts/bin/lmsysmd:node_modules/sonner",
         "//ts/bin/lmsysmd:node_modules/usehooks-ts",
     ],
 )

@@ -17,6 +17,8 @@ go_library(
         "//go/lib/handler/static",
         "//go/lib/middleware/buf/validate",
         "//go/lib/middleware/clerk",
+        "//go/pb/lmsysmd/rating/v1:rating",
+        "//go/pb/lmsysmd/rating/v1:rating_connect",
         "//go/pb/lmsysmd/sample/v1:sample",
         "//go/pb/lmsysmd/sample/v1:sample_connect",
         "@com_connectrpc_connect//:connect",

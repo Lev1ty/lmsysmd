@@ -15,25 +15,25 @@ message CreateRatingRequest {
   RatingState state = 2 [ (buf.validate.field).required = true ];
 }
 
-message CreateRatingResponse {}
+message CreateRatingResponse {
+  uint32 rating_id = 1 [ (buf.validate.field).required = true ];
+}
 
 message Rating {
-  string user_id = 1 [ (buf.validate.field).required = true ];
-  uint32 rating_id = 2;
-  uint32 sample_id = 3 [ (buf.validate.field).required = true ];
-  uint32 choice_id = 4 [ (buf.validate.field).required = true ];
+  uint32 rating_id = 1;
+  uint32 sample_id = 2 [ (buf.validate.field).required = true ];
+  uint32 choice_id = 3;
 }
 
 message RatingState {
-  string user_id = 1 [ (buf.validate.field).required = true ];
-  uint32 rating_id = 2 [ (buf.validate.field).required = true ];
-  uint32 state_id = 3;
+  uint32 rating_id = 1;
+  uint32 state_id = 2;
   enum State {
     STATE_UNSPECIFIED = 0;
     STATE_SUBMITTED = 1;
     STATE_CONFIRMED = 2;
   }
-  State state = 4 [
+  State state = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];

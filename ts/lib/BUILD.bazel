@@ -29,7 +29,6 @@ js_library(
 js_library(
     name = "pb_lib",
     srcs = [":pb"],
-    visibility = ["//ts/bin/lmsysmd/app:__pkg__"],
     deps = ["//ts/lib:node_modules/@bufbuild/protobuf"],
 )
 

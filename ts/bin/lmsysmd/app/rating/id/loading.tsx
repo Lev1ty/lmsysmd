@@ -2,7 +2,7 @@ import { Spinner } from "@nextui-org/react";
 
 export default function RatingLoading() {
   return (
-    <div className="flex flex-col justify-center items-center mx-auto min-h-dvh">
+    <div className="flex flex-col justify-center items-center w-full h-full">
       <Spinner color="primary" size="lg" />
     </div>
   );

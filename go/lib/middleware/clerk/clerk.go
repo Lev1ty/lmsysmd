@@ -150,7 +150,7 @@ func (mi Middleware) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 			slog.InfoContext(ctx, "user denied", "r", req, "sc", sc)
 			return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("clerk permission denied"))
 		}
-		return next(ctx, req)
+		return next(context.WithValue(ctx, value.ClerkSessionClaims, sc), req)
 	})
 }
 
@@ -164,74 +164,40 @@ func (mi Middleware) WrapStreamingHandler(next connect.StreamingHandlerFunc) con
 		ctx context.Context,
 		conn connect.StreamingHandlerConn,
 	) error {
-		return next(ctx, streamingHandlerConn{ctx: ctx, inner: conn, middleware: mi})
-	})
-}
-
-type streamingHandlerConn struct {
-	ctx        context.Context
-	inner      connect.StreamingHandlerConn
-	middleware Middleware
-}
-
-func (sc streamingHandlerConn) Spec() connect.Spec {
-	return sc.inner.Spec()
-}
-
-func (sc streamingHandlerConn) Peer() connect.Peer {
-	return sc.inner.Peer()
-}
-
-func (shc streamingHandlerConn) Receive(req any) error {
-	var cfg *Config
-	for _, c := range shc.middleware.Configs {
-		if slices.ContainsFunc(c.Includes, func(p string) bool {
-			return strings.HasPrefix(shc.Spec().Procedure, p)
-		}) && !slices.ContainsFunc(c.Excludes, func(p string) bool {
-			return strings.HasPrefix(shc.Spec().Procedure, p)
-		}) {
-			cfg = &c
-			break
+		var cfg *Config
+		for _, c := range mi.Configs {
+			if slices.ContainsFunc(c.Includes, func(p string) bool {
+				return strings.HasPrefix(conn.Spec().Procedure, p)
+			}) && !slices.ContainsFunc(c.Excludes, func(p string) bool {
+				return strings.HasPrefix(conn.Spec().Procedure, p)
+			}) {
+				cfg = &c
+				break
+			}
 		}
-	}
-	if cfg == nil {
-		return shc.Receive(req)
-	}
-	if cfg.RootKey != "" {
-		if k := strings.TrimPrefix(shc.RequestHeader().Get("authorization"), "Bearer "); k == cfg.RootKey {
-			return shc.Receive(req)
+		if cfg == nil {
+			return next(ctx, conn)
 		}
-	}
-	sc, ok := clerk.SessionClaimsFromContext(shc.ctx)
-	if !ok {
-		slog.InfoContext(shc.ctx, "invalid session claims", "r", req)
-		return connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("clerk unauthenticated"))
-	}
-	if len(cfg.Allowlist) > 0 {
-		if !slices.Contains(cfg.Allowlist, sc.Subject) {
-			slog.InfoContext(shc.ctx, "user not allowed", "r", req, "sc", sc)
+		if cfg.RootKey != "" {
+			if k := strings.TrimPrefix(conn.RequestHeader().Get("authorization"), "Bearer "); k == cfg.RootKey {
+				return next(ctx, conn)
+			}
+		}
+		sc, ok := clerk.SessionClaimsFromContext(ctx)
+		if !ok {
+			slog.InfoContext(ctx, "invalid session claims", "r", conn.RequestHeader())
+			return connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("clerk unauthenticated"))
+		}
+		if len(cfg.Allowlist) > 0 {
+			if !slices.Contains(cfg.Allowlist, sc.Subject) {
+				slog.InfoContext(ctx, "user not allowed", "r", conn.RequestHeader(), "sc", sc)
+				return connect.NewError(connect.CodePermissionDenied, fmt.Errorf("clerk permission denied"))
+			}
+		}
+		if slices.Contains(cfg.Denylist, sc.Subject) || slices.Contains(cfg.Denylist, "*") {
+			slog.InfoContext(ctx, "user denied", "r", conn.RequestHeader(), "sc", sc)
 			return connect.NewError(connect.CodePermissionDenied, fmt.Errorf("clerk permission denied"))
 		}
-	}
-	if slices.Contains(cfg.Denylist, sc.Subject) || slices.Contains(cfg.Denylist, "*") {
-		slog.InfoContext(shc.ctx, "user denied", "r", req, "sc", sc)
-		return connect.NewError(connect.CodePermissionDenied, fmt.Errorf("clerk permission denied"))
-	}
-	return shc.Receive(req)
-}
-
-func (sc streamingHandlerConn) RequestHeader() http.Header {
-	return sc.inner.RequestHeader()
-}
-
-func (sc streamingHandlerConn) Send(res any) error {
-	return sc.inner.Send(res)
-}
-
-func (sc streamingHandlerConn) ResponseHeader() http.Header {
-	return sc.inner.ResponseHeader()
-}
-
-func (sc streamingHandlerConn) ResponseTrailer() http.Header {
-	return sc.inner.ResponseTrailer()
+		return next(context.WithValue(ctx, value.ClerkSessionClaims, sc), conn)
+	})
 }

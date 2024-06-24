@@ -26,9 +26,18 @@ message Sample {
   ];
   message Choice {
     uint32 choice_id = 1 [ (buf.validate.field).required = true ];
-    string content = 2 [ (buf.validate.field).required = true ];
+    enum ContentCommon {
+      CONTENT_COMMON_UNSPECIFIED = 0;
+      CONTENT_COMMON_NONE_OF_THE_ABOVE = 1;
+    }
+    oneof content {
+      option (buf.validate.oneof).required = true;
+      string specific = 2;
+      ContentCommon common = 3
+          [ (buf.validate.field).enum.defined_only = true ];
+    }
   }
   repeated Choice choices = 3 [ (buf.validate.field).required = true ];
   string truth = 4 [ (buf.validate.field).required = true ];
-  uint32 set_id = 5;
+  uint32 dataset_id = 5;
 }

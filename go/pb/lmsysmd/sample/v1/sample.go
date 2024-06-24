@@ -43,7 +43,14 @@ func (ss *SampleService) GetSample(
 		if err := rs.Scan(&id, &content); err != nil {
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("scan sample choice %d: %w", req.Msg.GetSampleId(), err))
 		}
-		sam.Choices = append(sam.Choices, &samplev1.Sample_Choice{ChoiceId: id, Content: content})
+		c := &samplev1.Sample_Choice{ChoiceId: id}
+		common, ok := samplev1.Sample_Choice_ContentCommon_value[content]
+		if ok {
+			c.Content = &samplev1.Sample_Choice_Common{Common: samplev1.Sample_Choice_ContentCommon(common)}
+		} else {
+			c.Content = &samplev1.Sample_Choice_Specific{Specific: content}
+		}
+		sam.Choices = append(sam.Choices, c)
 	}
 	return connect.NewResponse(&samplev1.GetSampleResponse{Sample: sam}), nil
 }
