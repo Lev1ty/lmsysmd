@@ -30,4 +30,5 @@ message Sample {
   }
   repeated Choice choices = 3 [ (buf.validate.field).required = true ];
   string truth = 4 [ (buf.validate.field).required = true ];
+  uint32 set_id = 5;
 }

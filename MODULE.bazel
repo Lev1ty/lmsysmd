@@ -138,12 +138,11 @@ http_file(
 http_file(
     name = "buf_darwin_arm64",
     executable = True,
-    integrity = "sha256-/VzgbnvUUdQbhcdvG9jSDEszBgOqHQr7d8s81fKJisk=",
-    url = "https://github.com/bufbuild/buf/releases/download/v1.32.2/buf-Darwin-arm64",
+    url = "https://github.com/bufbuild/buf/releases/download/v1.34.0/buf-Darwin-arm64",
 )
 
 http_file(
     name = "buf_linux_amd64",
     executable = True,
-    url = "https://github.com/bufbuild/buf/releases/download/v1.32.2/buf-Linux-x86_64",
+    url = "https://github.com/bufbuild/buf/releases/download/v1.34.0/buf-Linux-x86_64",
 )

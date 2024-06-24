@@ -2,12 +2,39 @@ syntax = "proto3";
 
 package lmsysmd.rating.v1;
 
+import "buf/validate/validate.proto";
+
 service RatingService {
   rpc CreateRating(CreateRatingRequest) returns (CreateRatingResponse) {
     option idempotency_level = IDEMPOTENCY_UNKNOWN;
   }
 }
 
-message CreateRatingRequest {}
+message CreateRatingRequest {
+  Rating rating = 1 [ (buf.validate.field).required = true ];
+  RatingState state = 2 [ (buf.validate.field).required = true ];
+}
 
 message CreateRatingResponse {}
+
+message Rating {
+  string user_id = 1 [ (buf.validate.field).required = true ];
+  uint32 rating_id = 2;
+  uint32 sample_id = 3 [ (buf.validate.field).required = true ];
+  uint32 choice_id = 4 [ (buf.validate.field).required = true ];
+}
+
+message RatingState {
+  string user_id = 1 [ (buf.validate.field).required = true ];
+  uint32 rating_id = 2 [ (buf.validate.field).required = true ];
+  uint32 state_id = 3;
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_SUBMITTED = 1;
+    STATE_CONFIRMED = 2;
+  }
+  State state = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+}
