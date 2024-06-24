@@ -7,7 +7,7 @@ import "google/type/date.proto";
 
 service DatasetService {
   rpc BatchCreateDataset(BatchCreateDatasetRequest) returns (BatchCreateDatasetResponse) {
-    // Duplicate datasets should not be created and id should not auto-increment
+    // Multiple calls to this endpoint will result in subsequent calls acting as no-ops.
     option idempotency_level = IDEMPOTENT; 
   }
 }
