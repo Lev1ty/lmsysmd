@@ -34,16 +34,17 @@ message GetModelResponse {
 }
 
 message Model {
-  Name name = 1 [ 
+  uint32 id = 1 [ (buf.validate.field).required = true ];
+  Name name = 2 [ 
     (buf.validate.field).required = true, 
     (buf.validate.field).enum.defined_only = true 
   ];
-  string vendor = 2 [ (buf.validate.field).required = true ] ;
-  uint32 param_count_billion = 3 [ 
+  string vendor = 3 [ (buf.validate.field).required = true ] ;
+  uint32 param_count_billion = 4 [ 
     (buf.validate.field).required = true,
     (buf.validate.field).int.gt = 0
   ];
-  google.type.Date release_date = 4 [ (buf.validate.field).required = true ];
+  google.type.Date release_date = 5 [ (buf.validate.field).required = true ];
 }
 
 // More models will be added in the future.
