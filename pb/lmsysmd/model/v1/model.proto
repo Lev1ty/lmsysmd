@@ -46,7 +46,7 @@ message Model {
   google.type.Date release_date = 4 [ (buf.validate.field).required = true ];
 }
 
-// More models will be added in the future
+// More models will be added in the future.
 enum Name {
   NAME_UNSPECIFIED = 0;
   GPT_3_5 = 1;

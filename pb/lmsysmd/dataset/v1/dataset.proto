@@ -23,11 +23,11 @@ message BatchCreateDatasetResponse {
   repeated Dataset datasets = 1 [ (buf.validate.field).required = true ];
 }
 
-// Each dataset points to a parent model
+// Each dataset points to a parent model.
 message Dataset {
   uint32 parent = 1 [ (buf.validate.field).required = true ];
   uint32 dataset_id = 2 [ (buf.validate.field).required = true ];
-  // The metadata consists of input type, output type, and dataset creation time
+  // The metadata consists of input type, output type, and dataset creation time.
   map<string, string> meta = 3 [ 
     (buf.validate.field).required = true,
     (buf.validate.field).map.min_pairs = 1,
