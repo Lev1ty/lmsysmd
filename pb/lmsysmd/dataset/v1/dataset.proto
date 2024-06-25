@@ -23,32 +23,26 @@ message BatchCreateDatasetResponse {
   repeated Dataset datasets = 1 [ (buf.validate.field).required = true ];
 }
 
-// Each dataset is grouped by model_id
+// Each dataset points to a parent model
 message Dataset {
-  uint32 dataset_id = 1 [ (buf.validate.field).required = true ];
-  Model model = 2 [ (buf.validate.field).required = true, (buf.validate.field).enum.defined_only = true ];
-  string model_vendor = 3 [ (buf.validate.field).required = true ] ;
-  uint32 model_param_count_billion = 4 [ (buf.validate.field).required = true ];
-  google.type.Date model_release_date = 5 [ (buf.validate.field).required = true ];
-  map<string, string> meta = 6 [ (buf.validate.field).required = true];
-}
-
-
-enum ModelId {
-  GPT_3_5 = 0;
-  GPT_4 = 1;
-  GPT_4O = 2;
-  CLAUDE_3_OPUS = 3;
-  GEMINI_1_5_PRO = 4;
-  LLAMA_3_70B = 5;
-  GEMMA_2B = 6;
-  PHI_3_MINI = 7;
-  GEMMA_7B = 8;
-  PHI_3_SMALL = 9;
-  LLAMA_3_8B = 10;
-  PHI_3_MEDIUM = 11;
-  CLAUDE_3_HAIKU = 12;
-  CLAUDE_3_SONNET = 13;
-  CLAUDE_3_5_SONNET = 14;
-  YI_LARGE = 15;
+  uint32 parent = 1 [ (buf.validate.field).required = true ];
+  uint32 dataset_id = 2 [ (buf.validate.field).required = true ];
+  // The metadata consists of input type, output type, and dataset creation time
+  map<string, string> meta = 3 [ 
+    (buf.validate.field).required = true,
+    (buf.validate.field).map.min_pairs = 1,
+    (buf.validate.field).map.max_pairs = 3,
+    (buf.validate.field).map.keys = {
+      string: {
+        min_len: 2
+        max_len: 30
+      }
+    },
+    (buf.validate.field).map.values = {
+      string: {
+        min_len: 2
+        max_len: 30
+      }
+    }
+  ];
 }
