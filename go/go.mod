@@ -3,7 +3,7 @@ module github.com/Lev1ty/lmsysmd
 go 1.22.3
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.33.0-20240401165935-b983156c5e99.1
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.34.2-20240508200655-46a4cf4ba109.2
 	connectrpc.com/connect v1.16.2
 	github.com/bufbuild/protovalidate-go v0.6.2
 	github.com/clerk/clerk-sdk-go/v2 v2.0.4
