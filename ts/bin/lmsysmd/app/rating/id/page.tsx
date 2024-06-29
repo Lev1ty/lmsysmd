@@ -52,7 +52,7 @@ export default function Rating() {
         return;
       }
       if (choice === "skip") {
-        router.push("/rating");
+        router.push(`/rating?ts=${new Date().getTime()}`);
         return;
       }
       const choiceId = Number.parseInt(choice);
