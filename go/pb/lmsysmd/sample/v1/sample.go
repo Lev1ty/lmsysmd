@@ -29,7 +29,14 @@ func (ss *SampleService) GetSample(
 		}
 	})
 	sam := &samplev1.Sample{}
-	if err := ss.db.QueryRow(ctx, "SELECT id, content, truth FROM samples WHERE id = $1", req.Msg.GetSampleId()).Scan(&sam.SampleId, &sam.Content, &sam.Truth); err != nil {
+	if err := ss.db.QueryRow(ctx, `
+    SELECT ss.id, es.user_instruction, cs.truth
+    FROM samples AS ss
+    INNER JOIN cases AS cs ON cs.id = ss.case_id
+    INNER JOIN samplesets AS sss ON sss.id = ss.sampleset_id
+    INNER JOIN experiments AS es ON es.id = sss.experiment_id
+    WHERE ss.id = $1
+  `, req.Msg.GetSampleId()).Scan(&sam.SampleId, &sam.Content, &sam.Truth); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get sample %d: %w", req.Msg.GetSampleId(), err))
 	}
 	rs, err := ss.db.Query(ctx, "SELECT id, content FROM sample_choices WHERE sample_id = $1", req.Msg.GetSampleId())
