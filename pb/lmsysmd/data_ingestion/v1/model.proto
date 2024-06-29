@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package lmsysmd.model.v1;
+package lmsysmd.data_ingestion.v1;
 
 import "buf/validate/validate.proto";
 import "google/type/date.proto";
@@ -28,7 +28,7 @@ message Model {
   ];
   string display_name = 2 [ 
     (buf.validate.field).required = true, 
-    (buf.validate.field).string.min_len = 2, 
+    (buf.validate.field).string.min_len = 2 
   ];
   Provider provider = 3 [ 
     (buf.validate.field).required = true, 
