@@ -1,0 +1,148 @@
+bazel_dep(name = "aspect_bazel_lib", version = "2.7.8")
+bazel_dep(name = "aspect_rules_js", version = "1.42.3")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "buildifier_prebuilt", version = "6.4.0")
+bazel_dep(name = "circl", version = "1.3.8")
+bazel_dep(name = "gazelle", version = "0.37.0")
+bazel_dep(name = "rules_go", version = "0.48.1")
+bazel_dep(name = "rules_nodejs", version = "6.2.0")
+bazel_dep(name = "rules_pkg", version = "0.10.1")
+bazel_dep(name = "rules_oci", version = "1.7.6")
+bazel_dep(name = "toolchains_llvm", version = "1.0.0")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
+go_sdk.download(version = "1.22.3")
+go_sdk.nogo(nogo = "//go:nogo")
+
+go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
+go_deps.from_file(go_mod = "//go:go.mod")
+go_deps.module_override(
+    patch_strip = 1,
+    patches = ["//:go/patches/godotenvvault.patch"],
+    path = "github.com/dotenv-org/godotenvvault",
+)
+use_repo(
+    go_deps,
+    "build_buf_gen_go_bufbuild_protovalidate_protocolbuffers_go",
+    "com_connectrpc_connect",
+    "com_github_bufbuild_protovalidate_go",
+    "com_github_clerk_clerk_sdk_go_v2",
+    "com_github_dotenv_org_godotenvvault",
+    "com_github_jackc_pgx_v5",
+    "com_github_klauspost_compress",
+    "com_github_ulule_limiter_v3",
+    "org_golang_google_protobuf",
+    "org_golang_x_net",
+)
+
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+use_repo(node, "nodejs_toolchains")
+node.toolchain(node_version = "20.14.0")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+use_repo(pnpm, "pnpm")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm",
+    data = [
+        "//ts:package.json",
+        "//ts:patches/dotenv-vault@1.26.2.patch",
+        "//ts:pnpm-lock.yaml",
+        "//ts:pnpm-workspace.yaml",
+        "//ts/bin/lmsysmd:package.json",
+        "//ts/env:package.json",
+        "//ts/lib:package.json",
+    ],
+    npmrc = "//ts:.npmrc",
+    patch_args = {
+        "*": ["-p0"],
+        "dotenv-vault@1.26.2": ["-p1"],
+    },
+    pnpm_lock = "//ts:pnpm-lock.yaml",
+    quiet = False,
+    update_pnpm_lock = True,
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")
+
+oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")
+oci.pull(
+    name = "distroless_static",
+    image = "gcr.io/distroless/static",
+    platforms = [
+        "linux/amd64",
+        "linux/arm64/v8",
+    ],
+    reproducible = False,
+    tag = "latest",
+)
+use_repo(oci, "distroless_static")
+
+http_archive(
+    name = "org_chromium_sysroot_linux_arm64",
+    build_file_content = """filegroup(name = "sysroot", srcs = glob(["*/**"]), visibility = ["//visibility:public"])""",
+    integrity = "sha256-Ljo0T0jadrZTLz3oZ1n5Q1kpIUPMr2CUgU4JRBo2Yp8=",
+    urls = ["https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/0e28d9832614729bb5b731161ff96cb4d516f345/debian_bullseye_arm64_sysroot.tar.xz"],
+)
+
+http_archive(
+    name = "org_chromium_sysroot_linux_x86_64",
+    build_file_content = """filegroup(name = "sysroot", srcs = glob(["*/**"]), visibility = ["//visibility:public"])""",
+    integrity = "sha256-G+YOfEVqvFkKYTxk+rTqx2MsgexvInNKYbU2aaRAc0Y=",
+    urls = ["https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/2028cdaf24259d23adcff95393b8cc4f0eef714b/debian_bullseye_amd64_sysroot.tar.xz"],
+)
+
+llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+llvm.toolchain(llvm_version = "17.0.6")
+use_repo(llvm, "llvm_toolchain", "llvm_toolchain_llvm")
+
+register_toolchains("@llvm_toolchain//:all")
+
+llvm.toolchain(
+    name = "llvm_toolchain_with_sysroot",
+    llvm_version = "17.0.6",
+)
+llvm.toolchain_root(
+    name = "llvm_toolchain_with_sysroot",
+    label = "@llvm_toolchain_llvm//:BUILD",
+)
+llvm.sysroot(
+    name = "llvm_toolchain_with_sysroot",
+    label = "@org_chromium_sysroot_linux_arm64//:sysroot",
+    targets = ["linux-aarch64"],
+)
+llvm.sysroot(
+    name = "llvm_toolchain_with_sysroot",
+    label = "@org_chromium_sysroot_linux_x86_64//:sysroot",
+    targets = ["linux-x86_64"],
+)
+use_repo(llvm, "llvm_toolchain_with_sysroot")
+
+http_file(
+    name = "atlas_darwin_arm64",
+    executable = True,
+    urls = ["https://release.ariga.io/atlas/atlas-darwin-arm64-latest"],
+)
+
+http_file(
+    name = "atlas_linux_amd64",
+    executable = True,
+    urls = ["https://release.ariga.io/atlas/atlas-linux-amd64-latest"],
+)
+
+http_file(
+    name = "buf_darwin_arm64",
+    executable = True,
+    url = "https://github.com/bufbuild/buf/releases/download/v1.34.0/buf-Darwin-arm64",
+)
+
+http_file(
+    name = "buf_linux_amd64",
+    executable = True,
+    url = "https://github.com/bufbuild/buf/releases/download/v1.34.0/buf-Linux-x86_64",
+)

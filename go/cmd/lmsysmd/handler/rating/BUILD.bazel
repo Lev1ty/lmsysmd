@@ -1,0 +1,8 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "rating",
+    srcs = ["rating.go"],
+    importpath = "github.com/Lev1ty/lmsysmd/cmd/lmsysmd/handler/rating",
+    visibility = ["//visibility:public"],
+)

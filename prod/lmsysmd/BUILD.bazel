@@ -1,0 +1,53 @@
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push", "oci_tarball")
+load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
+
+pkg_tar(
+    name = "tar_lmsysmd",
+    srcs = ["//go/cmd/lmsysmd"],
+)
+
+pkg_tar(
+    name = "tar_env",
+    srcs = ["//ts/env/lmsysmd"],
+)
+
+genrule(
+    name = "env",
+    outs = [".env"],
+    cmd = "echo \"ENV=/.env.vault\nDOTENV_KEY=$$DOTENV_KEY\" > $@",
+)
+
+oci_image(
+    name = "image_staging",
+    base = "@distroless_static",
+    entrypoint = ["/lmsysmd"],
+    env = ":env",
+    tars = [
+        ":tar_lmsysmd",
+        ":tar_env",
+    ],
+)
+
+oci_tarball(
+    name = "tarball",
+    image = ":image_staging",
+    repo_tags = ["lmsysmd-web:latest"],
+)
+
+oci_image(
+    name = "image_prod",
+    base = "@distroless_static",
+    entrypoint = ["/lmsysmd"],
+    env = ":env",
+    tars = [
+        ":tar_lmsysmd",
+        ":tar_env",
+    ],
+)
+
+oci_push(
+    name = "push",
+    image = ":image_prod",
+    remote_tags = ["latest"],
+    repository = "registry.fly.io/lmsysmd-web",
+)

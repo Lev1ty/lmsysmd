@@ -1,0 +1,39 @@
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+npm_package(
+    name = "lib",
+    srcs = [
+        ":lib_src",
+        ":pb_lib",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+js_library(
+    name = "lib_src",
+    srcs = [
+        "clerk/token/hook.ts",
+        "package.json",
+    ],
+    deps = [
+        "//ts/lib:node_modules/@clerk/clerk-react",
+        "//ts/lib:node_modules/@tanstack/react-query",
+    ],
+)
+
+js_library(
+    name = "pb_lib",
+    srcs = [":pb"],
+    deps = ["//ts/lib:node_modules/@bufbuild/protobuf"],
+)
+
+copy_to_directory(
+    name = "pb",
+    srcs = ["//pb:gen"],
+    root_paths = ["pb/gen/ts"],
+)

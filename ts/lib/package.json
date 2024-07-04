@@ -1,0 +1,10 @@
+{
+  "name": "lib",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@bufbuild/protobuf": "1.10.0",
+    "@clerk/clerk-react": "5.2.5",
+    "@tanstack/react-query": "5.48.0"
+  }
+}

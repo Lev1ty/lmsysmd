@@ -1,0 +1,8 @@
+{
+  "name": "env",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "dotenv-vault": "1.26.2"
+  }
+}

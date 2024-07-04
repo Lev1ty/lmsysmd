@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package lmsysmd.load.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service ModelService {
+  rpc CreateModel(CreateModelRequest) returns (google.protobuf.Empty) {
+    option idempotency_level = IDEMPOTENT; 
+  }
+}
+
+message CreateModelRequest {
+  Model model = 1 [ 
+    (buf.validate.field).required = true,
+  ];
+}
+
+message Model {
+  ModelId model_id = 1 [ 
+    (buf.validate.field).required = true, 
+    (buf.validate.field).enum.defined_only = true 
+  ];
+  string display_name = 2 [ 
+    (buf.validate.field).required = true, 
+    (buf.validate.field).string.min_len = 2 
+  ];
+  Provider provider = 3 [ 
+    (buf.validate.field).required = true, 
+    (buf.validate.field).enum.defined_only = true 
+  ];
+  string model_url = 4 [ 
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true
+  ];
+  string model_provider_url = 5 [ 
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true
+  ];
+  google.protobuf.Timestamp release_time = 6 [ 
+    (buf.validate.field).required = true,
+    (buf.validate.field).timestamp.lt_now = true,
+    (buf.validate.field).timestamp.gt = { seconds: 1577836800 }
+  ]; // release_time must be after 2020-01-01 and before now
+}
+
+enum ModelId {
+  MODEL_ID_UNSPECIFIED = 0;
+  MODEL_ID_GPT_3_5_TURBO_0125 = 1;
+  MODEL_ID_GPT_4_TURBO_2024_04_09 = 2;
+  MODEL_ID_GPT_4O_2024_05_13 = 3;
+  MODEL_ID_CLAUDE_3_OPUS_20240229 = 4;
+  MODEL_ID_GEMINI_1_5_PRO = 5;
+  MODEL_ID_LLAMA_3_70B = 6;
+  MODEL_ID_GEMMA_1_2B_EN = 7;
+  MODEL_ID_PHI_3_MINI = 8;
+  MODEL_ID_GEMMA_1_7B_EN = 9;
+  MODEL_ID_PHI_3_SMALL = 10;
+  MODEL_ID_LLAMA_3_8B = 11;
+  MODEL_ID_PHI_3_MEDIUM = 12;
+  MODEL_ID_CLAUDE_3_HAIKU_20240307 = 13;
+  MODEL_ID_CLAUDE_3_SONNET_20240229 = 14;
+  MODEL_ID_CLAUDE_3_5_SONNET_20240620 = 15;
+  MODEL_ID_YI_LARGE = 16;
+}
+
+enum Provider {
+  PROVIDER_UNSPECIFIED = 0;
+  PROVIDER_OPENAI = 1;
+  PROVIDER_ANTRHOPIC = 2;
+  PROVIDER_GOOGLE = 3;
+  PROVIDER_META = 4;
+  PROVIDER_MICROSOFT = 5;
+  PROVIDER_ZERO_ONE_AI = 6;
+  PROVIDER_NVIDIA = 7;
+}

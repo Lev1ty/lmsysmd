@@ -1,0 +1,13 @@
+diff --git a/dist/vars.js b/dist/vars.js
+index 236ce075be7a8995d516f666843770bfb601202c..39e6a5456a76b2e571e0d33cbe9a983f1cf1d6c2 100644
+--- a/dist/vars.js
++++ b/dist/vars.js
+@@ -36,7 +36,7 @@ class Vars {
+         if ((0, fs_1.existsSync)('.env.project')) {
+             return '.env.project';
+         }
+-        return '.env.vault';
++        return process.env.DOTENV_VAULT || '.env.vault';
+     }
+     get vaultKey() {
+         if (this.vaultFilename === '.env.project') {

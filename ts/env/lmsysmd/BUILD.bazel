@@ -1,0 +1,18 @@
+load("@npm//ts/env:dotenv-vault/package_json.bzl", dotenv_vault_bin = "bin")
+
+dotenv_vault_bin.dotenv_vault(
+    name = "lmsysmd",
+    srcs = [".env.vault.in"],
+    outs = [".env.vault"],
+    args = [
+        "build",
+        "--yes",
+    ],
+    chdir = package_name(),
+    env = {"DOTENV_VAULT": ".env.vault.in"},
+    visibility = [
+        "//go/cmd/lmsysmd:__pkg__",
+        "//prod/lmsysmd:__pkg__",
+        "//ts/bin/lmsysmd:__pkg__",
+    ],
+)

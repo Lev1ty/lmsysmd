@@ -1,0 +1,9 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "static",
+    srcs = ["static.go"],
+    importpath = "github.com/Lev1ty/lmsysmd/lib/middleware/static",
+    visibility = ["//visibility:public"],
+    x_defs = {"buildTimestampSeconds": "{BUILD_TIMESTAMP}"},
+)

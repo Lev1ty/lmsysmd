@@ -1,0 +1,89 @@
+# https://docs.aspect.build/guides/bazelrc/#convenience-options
+common --heap_dump_on_oom
+# https://docs.aspect.build/guides/bazelrc/#convenience-options
+common --enable_platform_specific_config
+common --keep_going
+
+clean --async
+
+# https://docs.aspect.build/guides/bazelrc/#options-introduced-in-bazel-60
+build --noexperimental_action_cache_store_output_metadata
+# https://docs.aspect.build/guides/bazelrc/#correctness-options
+build --experimental_allow_tags_propagation
+# https://docs.aspect.build/guides/bazelrc/#options-introduced-in-bazel-60
+build --noexperimental_check_external_repository_files
+# https://docs.aspect.build/guides/bazelrc/#options-introduced-in-bazel-60
+build --noexperimental_check_output_files
+# https://github.com/aspect-build/rules_js/issues/409
+# build --nosandbox_default_allow_network
+# https://docs.aspect.build/guides/bazelrc/#correctness-options
+build --incompatible_default_to_explicit_init_py
+build --disk_cache=~/.cache/bazel
+# https://docs.aspect.build/guides/bazelrc/#performance-options
+build --nolegacy_external_runfiles
+build --nolegacy_important_outputs
+build --jobs=64
+# https://docs.aspect.build/guides/bazelrc/#correctness-options
+build --noremote_upload_local_results
+# https://docs.aspect.build/guides/bazelrc/#performance-options
+build --incompatible_remote_results_ignore_disk
+# https://docs.aspect.build/guides/bazelrc/#performance-options
+# https://docs.aspect.build/guides/bazelrc/#options-introduced-in-bazel-60
+build --reuse_sandbox_directories
+# https://docs.aspect.build/guides/bazelrc/#convenience-options
+build --show_result=20
+# https://github.com/bazelbuild/rules_go/blob/master/docs/go/core/defines_and_stamping.md#defines-and-stamping
+build --stamp
+# https://docs.aspect.build/guides/bazelrc/#correctness-options
+build --incompatible_strict_action_env
+build --experimental_writable_outputs
+build --experimental_ui_max_stdouterr_bytes=512000000
+
+build --extra_toolchains=@llvm_toolchain_with_sysroot//:cc-toolchain-aarch64-linux
+build --extra_toolchains=@llvm_toolchain_with_sysroot//:cc-toolchain-x86_64-linux
+
+build:release --compilation_mode=opt
+build:release --strip=always
+
+build:staging --config=release
+build:staging --platforms=@toolchains_llvm//platforms:linux-aarch64
+
+build:prod --config=release
+build:prod --platforms=@toolchains_llvm//platforms:linux-x86_64
+
+# https://docs.aspect.build/guides/bazelrc/#correctness-options
+fetch --experimental_allow_tags_propagation
+# https://docs.aspect.build/guides/bazelrc/#options-introduced-in-bazel-60
+fetch --noexperimental_check_external_repository_files
+# https://docs.aspect.build/guides/bazelrc/#options-introduced-in-bazel-60
+fetch --noexperimental_check_output_files
+
+# https://docs.aspect.build/guides/bazelrc/#correctness-options
+query --experimental_allow_tags_propagation
+# https://docs.aspect.build/guides/bazelrc/#options-introduced-in-bazel-60
+query --noexperimental_check_external_repository_files
+# https://docs.aspect.build/guides/bazelrc/#options-introduced-in-bazel-60
+query --noexperimental_check_output_files
+
+# https://docs.aspect.build/guides/bazelrc/#options-for-javascript
+run:debug -- --node_options=--inspect-brk
+
+# https://github.com/aspect-build/rules_js/issues/1408
+startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
+
+test --build_tests_only
+# https://docs.aspect.build/guides/bazelrc/#correctness-options
+test --incompatible_exclusive_test_sandboxed
+# https://docs.aspect.build/guides/bazelrc/#correctness-options
+test --experimental_fetch_all_coverage_outputs
+# https://docs.aspect.build/guides/bazelrc/#convenience-options
+test --test_output=errors
+test --test_verbose_timeout_warnings
+
+# https://docs.aspect.build/guides/bazelrc/#debug-options
+test:debug --test_output=streamed
+test:debug --test_strategy=exclusive
+test:debug --test_timeout=9999
+test:debug --nocache_test_results
+
+try-import %workspace%/.bazelrc.user

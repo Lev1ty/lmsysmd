@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "validate",
+    srcs = ["validate.go"],
+    importpath = "github.com/Lev1ty/lmsysmd/lib/middleware/buf/validate",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_connectrpc_connect//:connect",
+        "@com_github_bufbuild_protovalidate_go//:protovalidate-go",
+        "@org_golang_google_protobuf//proto",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+    ],
+)
