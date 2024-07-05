@@ -50,7 +50,7 @@ message Model {
   google.protobuf.Timestamp release_time = 6 [ 
     (buf.validate.field).required = true,
     (buf.validate.field).timestamp.lt_now = true,
-    (buf.validate.field).timestamp.gt = { seconds: 1577836800 }
+    (buf.validate.field).timestamp.gt.seconds = 1577836800
   ]; // release_time must be after 2020-01-01 and before now
 }
 
