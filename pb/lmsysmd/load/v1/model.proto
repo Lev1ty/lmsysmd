@@ -17,7 +17,7 @@ message BatchCreateModelRequest {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.min_len = 2,
-    (buf.validate.field).string.max_len = 60
+    (buf.validate.field).string.max_len = 150
   ];
 }
 
@@ -29,7 +29,7 @@ message Model {
   string display_name = 2 [ 
     (buf.validate.field).required = true, 
     (buf.validate.field).string.min_len = 2,
-    (buf.validate.field).string.max_len = 20
+    (buf.validate.field).string.max_len = 40
   ];
   ModelProvider provider = 3 [ 
     (buf.validate.field).required = true, 
@@ -39,13 +39,13 @@ message Model {
     (buf.validate.field).required = true,
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.min_len = 2,
-    (buf.validate.field).string.max_len = 60
+    (buf.validate.field).string.max_len = 150
   ];
   string model_provider_url = 5 [ 
     (buf.validate.field).required = true,
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.min_len = 2,
-    (buf.validate.field).string.max_len = 60
+    (buf.validate.field).string.max_len = 150
   ];
   google.protobuf.Timestamp release_time = 6 [ 
     (buf.validate.field).required = true,
