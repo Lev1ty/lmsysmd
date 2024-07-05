@@ -7,14 +7,17 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 service ModelService {
-  rpc CreateModel(CreateModelRequest) returns (google.protobuf.Empty) {
+  rpc BatchCreateModel(BatchCreateModelRequest) returns (google.protobuf.Empty) {
     option idempotency_level = IDEMPOTENT; 
   }
 }
 
-message CreateModelRequest {
-  Model model = 1 [ 
+message BatchCreateModelRequest {
+  string google_sheet_url = 1 [ 
     (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 60
   ];
 }
 
@@ -25,19 +28,24 @@ message Model {
   ];
   string display_name = 2 [ 
     (buf.validate.field).required = true, 
-    (buf.validate.field).string.min_len = 2 
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 20
   ];
-  Provider provider = 3 [ 
+  ModelProvider provider = 3 [ 
     (buf.validate.field).required = true, 
     (buf.validate.field).enum.defined_only = true 
   ];
   string model_url = 4 [ 
     (buf.validate.field).required = true,
-    (buf.validate.field).string.uri = true
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 60
   ];
   string model_provider_url = 5 [ 
     (buf.validate.field).required = true,
     (buf.validate.field).string.uri = true
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 60
   ];
   google.protobuf.Timestamp release_time = 6 [ 
     (buf.validate.field).required = true,
@@ -54,9 +62,9 @@ enum ModelId {
   MODEL_ID_CLAUDE_3_OPUS_20240229 = 4;
   MODEL_ID_GEMINI_1_5_PRO = 5;
   MODEL_ID_LLAMA_3_70B = 6;
-  MODEL_ID_GEMMA_1_2B_EN = 7;
+  MODEL_ID_GEMMA_1_2B = 7;
   MODEL_ID_PHI_3_MINI = 8;
-  MODEL_ID_GEMMA_1_7B_EN = 9;
+  MODEL_ID_GEMMA_1_7B = 9;
   MODEL_ID_PHI_3_SMALL = 10;
   MODEL_ID_LLAMA_3_8B = 11;
   MODEL_ID_PHI_3_MEDIUM = 12;
@@ -66,13 +74,13 @@ enum ModelId {
   MODEL_ID_YI_LARGE = 16;
 }
 
-enum Provider {
-  PROVIDER_UNSPECIFIED = 0;
-  PROVIDER_OPENAI = 1;
-  PROVIDER_ANTRHOPIC = 2;
-  PROVIDER_GOOGLE = 3;
-  PROVIDER_META = 4;
-  PROVIDER_MICROSOFT = 5;
-  PROVIDER_ZERO_ONE_AI = 6;
-  PROVIDER_NVIDIA = 7;
+enum ModelProvider {
+  MODEL_PROVIDER_UNSPECIFIED = 0;
+  MODEL_PROVIDER_OPENAI = 1;
+  MODEL_PROVIDER_ANTRHOPIC = 2;
+  MODEL_PROVIDER_GOOGLE = 3;
+  MODEL_PROVIDER_META = 4;
+  MODEL_PROVIDER_MICROSOFT = 5;
+  MODEL_PROVIDER_ZERO_ONE_AI = 6;
+  MODEL_PROVIDER_NVIDIA = 7;
 }
