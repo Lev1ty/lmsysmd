@@ -3,17 +3,17 @@ syntax = "proto3";
 package lmsysmd.load.v1;
 
 import "buf/validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service ModelService {
   rpc BatchCreateModel(BatchCreateModelRequest) returns (google.protobuf.Empty) {
-    option idempotency_level = IDEMPOTENT; 
+    option idempotency_level = IDEMPOTENT;
   }
 }
 
 message BatchCreateModelRequest {
-  string google_sheet_url = 1 [ 
+  string google_sheet_url = 1 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.min_len = 2,
@@ -22,32 +22,32 @@ message BatchCreateModelRequest {
 }
 
 message Model {
-  ModelId model_id = 1 [ 
-    (buf.validate.field).required = true, 
-    (buf.validate.field).enum.defined_only = true 
+  ModelId model_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
   ];
-  string display_name = 2 [ 
-    (buf.validate.field).required = true, 
+  string display_name = 2 [
+    (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 2,
     (buf.validate.field).string.max_len = 40
   ];
-  ModelProvider provider = 3 [ 
-    (buf.validate.field).required = true, 
-    (buf.validate.field).enum.defined_only = true 
+  ModelProvider provider = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
   ];
-  string model_url = 4 [ 
+  string model_url = 4 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.min_len = 2,
     (buf.validate.field).string.max_len = 150
   ];
-  string model_provider_url = 5 [ 
+  string model_provider_url = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.uri = true,
     (buf.validate.field).string.min_len = 2,
     (buf.validate.field).string.max_len = 150
   ];
-  google.protobuf.Timestamp release_time = 6 [ 
+  google.protobuf.Timestamp release_time = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).timestamp.lt_now = true,
     (buf.validate.field).timestamp.gt.seconds = 1577836800
