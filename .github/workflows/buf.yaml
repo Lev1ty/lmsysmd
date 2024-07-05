@@ -6,6 +6,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: bufbuild/buf-setup-action@v1
+      - run: cd pb && buf format --diff --exit-code
       - uses: bufbuild/buf-lint-action@v1
         with:
           input: pb
+      - uses: bufbuild/buf-breaking-action@v1
+        with:
+          input: pb
+          against: "https://github.com/Lev1ty/lmsysmd.git#branch=main,ref=HEAD~1"

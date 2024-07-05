@@ -11,21 +11,21 @@ service SampleService {
 }
 
 message GetSampleRequest {
-  uint32 sample_id = 1 [ (buf.validate.field).required = true ];
+  uint32 sample_id = 1 [(buf.validate.field).required = true];
 }
 
 message GetSampleResponse {
-  Sample sample = 1 [ (buf.validate.field).required = true ];
+  Sample sample = 1 [(buf.validate.field).required = true];
 }
 
 message Sample {
-  uint32 sample_id = 1 [ (buf.validate.field).required = true ];
+  uint32 sample_id = 1 [(buf.validate.field).required = true];
   string content = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 4
   ];
   message Choice {
-    uint32 choice_id = 1 [ (buf.validate.field).required = true ];
+    uint32 choice_id = 1 [(buf.validate.field).required = true];
     enum ContentCommon {
       CONTENT_COMMON_UNSPECIFIED = 0;
       CONTENT_COMMON_NONE_OF_THE_ABOVE = 1;
@@ -33,11 +33,10 @@ message Sample {
     oneof content {
       option (buf.validate.oneof).required = true;
       string specific = 2;
-      ContentCommon common = 3
-          [ (buf.validate.field).enum.defined_only = true ];
+      ContentCommon common = 3 [(buf.validate.field).enum.defined_only = true];
     }
   }
-  repeated Choice choices = 3 [ (buf.validate.field).required = true ];
-  string truth = 4 [ (buf.validate.field).required = true ];
+  repeated Choice choices = 3 [(buf.validate.field).required = true];
+  string truth = 4 [(buf.validate.field).required = true];
   uint32 dataset_id = 5;
 }
