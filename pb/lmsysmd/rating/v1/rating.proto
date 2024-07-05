@@ -11,17 +11,17 @@ service RatingService {
 }
 
 message CreateRatingRequest {
-  Rating rating = 1 [ (buf.validate.field).required = true ];
-  RatingState state = 2 [ (buf.validate.field).required = true ];
+  Rating rating = 1 [(buf.validate.field).required = true];
+  RatingState state = 2 [(buf.validate.field).required = true];
 }
 
 message CreateRatingResponse {
-  uint32 rating_id = 1 [ (buf.validate.field).required = true ];
+  uint32 rating_id = 1 [(buf.validate.field).required = true];
 }
 
 message Rating {
   uint32 rating_id = 1;
-  uint32 sample_id = 2 [ (buf.validate.field).required = true ];
+  uint32 sample_id = 2 [(buf.validate.field).required = true];
   uint32 choice_id = 3;
 }
 
