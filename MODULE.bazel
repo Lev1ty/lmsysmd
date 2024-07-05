@@ -15,7 +15,7 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
-go_sdk.download(version = "1.22.3")
+go_sdk.download(version = "1.22.5")
 go_sdk.nogo(nogo = "//go:nogo")
 
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
