@@ -15,7 +15,7 @@
     "@tanstack/react-query": "5.50.1",
     "@tanstack/react-query-devtools": "5.50.1",
     "@tanstack/react-query-persist-client": "5.50.1",
-    "@types/node": "20.14.9",
+    "@types/node": "20.14.10",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "dotenv": "16.4.5",
