@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package lmsysmd.load.data.v1;
+
+import "buf/validate/validate.proto";
+import "lmsysmd/load/model/v1/model.proto";
+
+service DataService {
+  rpc BatchCreateData(BatchCreateDataRequest) returns (BatchCreateDataResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+message BatchCreateDataRequest {
+  string google_sheet_url = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 150
+  ];
+}
+
+message BatchCreateDataResponse {}
+
+// The fields are based on the columns in https://docs.google.com/spreadsheets/d/1MWVXNHXgLdTHHTVmpi9HmQ3DRV6uU3CWfHdxshUeEUU/edit?gid=0#gid=0.
+message Data {
+  uint64 experiment_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).uint64.gt = 0
+  ];
+  lmsysmd.load.model.v1.ModelId model_id = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  enum CaseCategory {
+    CASE_CATEGORY_UNSPECIFIED = 0;
+    CASE_CATEGORY_BR = 1;
+    CASE_CATEGORY_CH = 2;
+    CASE_CATEGORY_CV = 3;
+    CASE_CATEGORY_GI = 4;
+    CASE_CATEGORY_GU = 5;
+    CASE_CATEGORY_HN = 6;
+    CASE_CATEGORY_MK = 7;
+    CASE_CATEGORY_NR = 8;
+    CASE_CATEGORY_OB = 9;
+    CASE_CATEGORY_PD = 10;
+  }
+  CaseCategory case_category = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  uint64 case_id = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).uint64.gt = 0
+  ];
+  string ground_truth = 5 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 100
+  ];
+  string prompt = 6 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 250
+  ];
+  enum CaseInputType {
+    CASE_INPUT_TYPE_UNSPECIFIED = 0;
+    CASE_INPUT_TYPE_HIST = 1;
+    CASE_INPUT_TYPE_FIND = 2;
+    CASE_INPUT_TYPE_HXF = 3;
+  }
+  CaseInputType case_input_type = 7 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  string case_input_content = 8 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 5000
+  ];
+  enum CaseInstruction {
+    CASE_INSTRUCTION_UNSPECIFIED = 0;
+    CASE_INSTRUCTION_DIFFERENTIAL_DIAGNOSIS = 1;
+  }
+  CaseInstruction case_instruction = 9 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).enum.defined_only = true
+  ];
+  repeated string results = 10 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).repeated.min_items = 5,
+    (buf.validate.field).repeated.max_items = 5,
+    (buf.validate.field).repeated.items = {
+      string: {
+        min_len: 2
+        max_len: 250
+      }
+    }
+  ];
+  // TODO: Add labels once the labels are finalized.
+  enum DataLabel {
+    DATA_LABEL_UNSPECIFIED = 0;
+  }
+  repeated DataLabel labels = 11 [
+    (buf.validate.field).repeated.max_items = 5,
+    (buf.validate.field).repeated.items = {
+      enum: {defined_only: true}
+    }
+  ];
+}
