@@ -1,0 +1,35 @@
+version: v2
+managed:
+  enabled: true
+  disable:
+    - file_option: go_package
+      module: buf.build/bufbuild/protovalidate
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+    - file_option: go_package
+      module: buf.build/protocolbuffers/wellknowntypes
+  override:
+    - file_option: go_package_prefix
+      value: github.com/Lev1ty/lmsysmd/pbi
+plugins:
+  - remote: buf.build/connectrpc/go
+    out: pb/gen/go
+    opt: paths=source_relative
+  - remote: buf.build/protocolbuffers/go
+    out: pb/gen/go
+    opt: paths=source_relative
+  - remote: buf.build/bufbuild/es
+    out: pb/gen/ts
+    opt:
+      - import_extension=none
+      - target=ts
+  - remote: buf.build/connectrpc/es
+    out: pb/gen/ts
+    opt:
+      - import_extension=none
+      - target=ts
+  - remote: buf.build/connectrpc/query-es
+    out: pb/gen/ts
+    opt:
+      - import_extension=none
+      - target=ts

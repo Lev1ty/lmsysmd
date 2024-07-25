@@ -1,0 +1,22 @@
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
+
+sh_binary(
+    name = "apply",
+    srcs = ["//hcl/schema:apply_sh"],
+    data = [
+        "schema.hcl",
+        "//hcl/schema:atlas",
+    ],
+    env = {
+        "ATLAS": "$(rootpath //hcl/schema:atlas)",
+        "SCHEMA": "$(rootpath schema.hcl)",
+    },
+)
+
+write_source_file(
+    name = "inspect",
+    diff_test = False,
+    in_file = "//hcl/schema:inspect_gen",
+    out_file = "schema.hcl",
+    tags = ["manual"],
+)

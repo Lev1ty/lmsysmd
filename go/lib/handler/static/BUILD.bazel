@@ -1,0 +1,12 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "static",
+    srcs = ["static.go"],
+    importpath = "github.com/Lev1ty/lmsysmd/lib/handler/static",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/lib/middleware/static",
+        "@com_github_klauspost_compress//gzhttp",
+    ],
+)

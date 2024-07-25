@@ -1,0 +1,12 @@
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+load("@gazelle//:def.bzl", "gazelle")
+
+buildifier(name = "buildifier")
+
+# gazelle:exclude pb
+gazelle(name = "gazelle")
+
+config_setting(
+    name = "opt",
+    values = {"compilation_mode": "opt"},
+)

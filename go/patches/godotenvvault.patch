@@ -1,0 +1,6 @@
+diff --git a/godotenvvault.go b/godotenvvault.go
+--- a/godotenvvault.go
++++ b/godotenvvault.go
+@@ -123,1 +123,1 @@
+-	return loadFile(".env.vault", false)
++	return loadFile(filenames[0], false)

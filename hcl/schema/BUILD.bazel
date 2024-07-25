@@ -1,0 +1,30 @@
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+
+write_file(
+    name = "apply_sh",
+    out = "apply.sh",
+    content = ["$ATLAS schema apply --url $DSN --to \"file://$SCHEMA\" ${@:-}"],
+    is_executable = True,
+    visibility = ["//hcl/schema:__subpackages__"],
+)
+
+genrule(
+    name = "inspect_gen",
+    outs = ["inspect_gen.hcl"],
+    cmd = "$(execpath :atlas) schema inspect --url $$DSN $${@:-} > $@",
+    tags = ["manual"],
+    tools = [":atlas"],
+    visibility = ["//hcl/schema:__subpackages__"],
+)
+
+native_binary(
+    name = "atlas",
+    src = select({
+        "@rules_go//go/platform:darwin_arm64": "@atlas_darwin_arm64//file",
+        "@rules_go//go/platform:linux_amd64": "@atlas_linux_amd64//file",
+        "//conditions:default": "@platforms//:incompatible",
+    }),
+    out = "atlas",
+    visibility = ["//hcl/schema:__subpackages__"],
+)

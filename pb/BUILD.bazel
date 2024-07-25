@@ -1,0 +1,49 @@
+load("@aspect_bazel_lib//lib:run_binary.bzl", "run_binary")
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
+
+run_binary(
+    name = "gen",
+    srcs = [
+        "buf.gen.yaml",
+        "buf.lock",
+        "buf.yaml",
+    ] + glob(["**/*.proto"]),
+    outs = [
+        "gen/go/lmsysmd/rating/v1/rating.pb.go",
+        "gen/go/lmsysmd/rating/v1/ratingv1connect/rating.connect.go",
+        "gen/go/lmsysmd/sample/v1/sample.pb.go",
+        "gen/go/lmsysmd/sample/v1/samplev1connect/sample.connect.go",
+        "gen/go/lmsysmd/load/data/v1/data.pb.go",
+        "gen/go/lmsysmd/load/data/v1/datav1connect/data.connect.go",
+        "gen/ts/lmsysmd/rating/v1/rating-RatingService_connectquery.ts",
+        "gen/ts/lmsysmd/rating/v1/rating_connect.ts",
+        "gen/ts/lmsysmd/rating/v1/rating_pb.ts",
+        "gen/ts/lmsysmd/sample/v1/sample-SampleService_connectquery.ts",
+        "gen/ts/lmsysmd/sample/v1/sample_connect.ts",
+        "gen/ts/lmsysmd/sample/v1/sample_pb.ts",
+        "gen/ts/lmsysmd/load/data/v1/data-DataService_connectquery.ts",
+        "gen/ts/lmsysmd/load/data/v1/data_connect.ts",
+        "gen/ts/lmsysmd/load/data/v1/data_pb.ts",
+    ],
+    args = [
+        "generate",
+        package_name(),
+        "--include-imports",
+        "--template",
+        "$(execpath buf.gen.yaml)",
+        "--output",
+        "$(BINDIR)",
+    ],
+    tool = ":buf",
+    visibility = ["//visibility:public"],
+)
+
+native_binary(
+    name = "buf",
+    src = select({
+        "@rules_go//go/platform:darwin_arm64": "@buf_darwin_arm64//file",
+        "@rules_go//go/platform:linux_amd64": "@buf_linux_amd64//file",
+        "//conditions:default": "@platforms//:incompatible",
+    }),
+    out = "buf",
+)

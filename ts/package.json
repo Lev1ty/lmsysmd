@@ -1,0 +1,14 @@
+{
+  "pnpm": {
+    "packageExtensions": {
+      "dotenv-vault": {
+        "dependencies": {
+          "tslib": "2.6.3"
+        }
+      }
+    },
+    "patchedDependencies": {
+      "dotenv-vault@1.26.2": "patches/dotenv-vault@1.26.2.patch"
+    }
+  }
+}
