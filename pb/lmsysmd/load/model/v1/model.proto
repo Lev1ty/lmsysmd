@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package lmsysmd.load.v1;
+package lmsysmd.load.model.v1;
 
 import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
