@@ -24,10 +24,7 @@ message BatchCreateDataResponse {}
 
 // The fields are based on the columns in https://docs.google.com/spreadsheets/d/1MWVXNHXgLdTHHTVmpi9HmQ3DRV6uU3CWfHdxshUeEUU/edit?gid=0#gid=0.
 message Data {
-  uint64 experiment_id = 1 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).uint64.gt = 0
-  ];
+  uint32 experiment_id = 1 [(buf.validate.field).required = true];
   lmsysmd.load.model.v1.ModelId model_id = 2 [
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
@@ -49,19 +46,16 @@ message Data {
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
-  uint64 case_id = 4 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).uint64.gt = 0
-  ];
+  uint32 case_id = 4 [(buf.validate.field).required = true];
   string ground_truth = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 2,
-    (buf.validate.field).string.max_len = 100
+    (buf.validate.field).string.max_len = 128
   ];
   string prompt = 6 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 2,
-    (buf.validate.field).string.max_len = 250
+    (buf.validate.field).string.max_len = 512
   ];
   enum CaseInputType {
     CASE_INPUT_TYPE_UNSPECIFIED = 0;
@@ -76,7 +70,7 @@ message Data {
   string case_input_content = 8 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 2,
-    (buf.validate.field).string.max_len = 5000
+    (buf.validate.field).string.max_len = 8192
   ];
   enum CaseInstruction {
     CASE_INSTRUCTION_UNSPECIFIED = 0;
@@ -90,21 +84,15 @@ message Data {
     (buf.validate.field).required = true,
     (buf.validate.field).repeated.min_items = 5,
     (buf.validate.field).repeated.max_items = 5,
-    (buf.validate.field).repeated.items = {
-      string: {
-        min_len: 2
-        max_len: 250
-      }
-    }
+    (buf.validate.field).repeated.items.string.min_len = 2,
+    (buf.validate.field).repeated.items.string.max_len = 256
   ];
-  // TODO: Add labels once the labels are finalized.
+  // TODO (sunb26): Add labels once the labels are finalized.
   enum DataLabel {
     DATA_LABEL_UNSPECIFIED = 0;
   }
   repeated DataLabel labels = 11 [
     (buf.validate.field).repeated.max_items = 5,
-    (buf.validate.field).repeated.items = {
-      enum: {defined_only: true}
-    }
+    (buf.validate.field).repeated.items.enum.defined_only = true
   ];
 }
