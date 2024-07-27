@@ -12,10 +12,12 @@ service ModelService {
 }
 
 message BatchCreateModelRequest {
-  bytes csv_file = 1 [
+  string google_sheet_url = 1 [
     (buf.validate.field).required = true,
-    (buf.validate.field).bytes.max_len = 1048576
-  ]; // The uploaded file has a 1 MB limit.
+    (buf.validate.field).string.uri = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 150
+  ];
 }
 
 message BatchCreateModelResponse {}
