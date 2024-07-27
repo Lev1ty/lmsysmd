@@ -87,7 +87,7 @@ message Data {
     (buf.validate.field).repeated.items.string.min_len = 2,
     (buf.validate.field).repeated.items.string.max_len = 256
   ];
-  // TODO (sunb26): Add labels once the labels are finalized.
+  // TODO(sunb26): Add labels once the labels are finalized.
   enum DataLabel {
     DATA_LABEL_UNSPECIFIED = 0;
   }
