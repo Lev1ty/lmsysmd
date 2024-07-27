@@ -59,9 +59,9 @@ message Data {
   ];
   enum CaseInputType {
     CASE_INPUT_TYPE_UNSPECIFIED = 0;
-    CASE_INPUT_TYPE_HIST = 1;
-    CASE_INPUT_TYPE_FIND = 2;
-    CASE_INPUT_TYPE_HXF = 3;
+    CASE_INPUT_TYPE_HISTORY = 1;
+    CASE_INPUT_TYPE_FINDINGS = 2;
+    CASE_INPUT_TYPE_HISTORY_AND_FINDINGS = 3;
   }
   CaseInputType case_input_type = 7 [
     (buf.validate.field).required = true,
