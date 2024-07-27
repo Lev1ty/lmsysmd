@@ -91,7 +91,7 @@ message Data {
   enum DataLabel {
     DATA_LABEL_UNSPECIFIED = 0;
   }
-  repeated DataLabel labels = 11 [
+  repeated DataLabel data_labels = 11 [
     (buf.validate.field).repeated.max_items = 5,
     (buf.validate.field).repeated.items.enum.defined_only = true
   ];
