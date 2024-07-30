@@ -1,0 +1,44 @@
+load("@bazel_skylib//rules:select_file.bzl", "select_file")
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "model",
+    srcs = ["model.go"],
+    importpath = "github.com/Lev1ty/lmsysmd/pb/lmsysmd/load/model/v1",
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "model_connect",
+    srcs = [":model_connect_go"],
+    importpath = "github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/model/v1/modelv1connect",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":model_pb",
+        "@com_connectrpc_connect//:connect",
+    ],
+)
+
+select_file(
+    name = "model_connect_go",
+    srcs = "//pb:gen",
+    subpath = "go/lmsysmd/load/model/v1/modelv1connect/model.connect.go",
+)
+
+go_library(
+    name = "model_pb",
+    srcs = [":model_pb_go"],
+    importpath = "github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/model/v1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@build_buf_gen_go_bufbuild_protovalidate_protocolbuffers_go//buf/validate",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//runtime/protoimpl",
+    ],
+)
+
+select_file(
+    name = "model_pb_go",
+    srcs = "//pb:gen",
+    subpath = "go/lmsysmd/load/model/v1/model.pb.go",
+)
