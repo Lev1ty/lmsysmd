@@ -9,8 +9,10 @@ import (
 	"github.com/Lev1ty/lmsysmd/lib/handler/static"
 	"github.com/Lev1ty/lmsysmd/lib/middleware/buf/validate"
 	"github.com/Lev1ty/lmsysmd/lib/middleware/clerk"
+	"github.com/Lev1ty/lmsysmd/pb/lmsysmd/load/data/v1"
 	pbrating "github.com/Lev1ty/lmsysmd/pb/lmsysmd/rating/v1"
 	"github.com/Lev1ty/lmsysmd/pb/lmsysmd/sample/v1"
+	"github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/data/v1/datav1connect"
 	"github.com/Lev1ty/lmsysmd/pbi/lmsysmd/rating/v1/ratingv1connect"
 	"github.com/Lev1ty/lmsysmd/pbi/lmsysmd/sample/v1/samplev1connect"
 	"github.com/ulule/limiter/v3"
@@ -34,5 +36,8 @@ func external(mux *http.ServeMux, rls limiter.Store) http.Handler {
 		clerk.Middleware{Configs: []clerk.Config{{Includes: []string{"/"}}}},
 		validate.Middleware{},
 	))))
+	mux.Handle(datav1connect.NewDataServiceHandler(&data.DataService{}, connect.WithInterceptors(
+		validate.Middleware{},
+	)))
 	return mux
 }
