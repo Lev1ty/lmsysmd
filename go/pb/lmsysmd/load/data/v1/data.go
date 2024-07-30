@@ -60,10 +60,12 @@ func (ds *DataService) BatchCreateData(
 	} else {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get spreadsheet id: could not parse spreadsheet id from url"))
 	}
-	data, err := ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, "Sheet1!A2:K").Do()
+	_, err := ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, "Sheet1!A2:K").Do()
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get google sheet data: %s", err.Error()))
 	}
+
+	// TODO(sunb26): Implement parse row data and insert into database accordingly
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
 }
