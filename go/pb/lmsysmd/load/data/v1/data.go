@@ -54,6 +54,10 @@ var caseInstructionEnumMap = map[string]datav1.Data_CaseInstruction{
 	"DIFFERENTIAL_DIAGNOSIS": datav1.Data_CASE_INSTRUCTION_DIFFERENTIAL_DIAGNOSIS,
 }
 
+// This variable defines the range of the spreadsheet to be read. 'A2' assumes the csv has headers in the first row. 'K' is the last column
+// and should be adjusted accordingly should a column be added or removed.
+const spreadsheetRange = "Sheet1!A2:K"
+
 func (ds *DataService) BatchCreateData(
 	ctx context.Context,
 	req *connect.Request[datav1.BatchCreateDataRequest],
@@ -80,7 +84,7 @@ func (ds *DataService) BatchCreateData(
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get spreadsheet id: %w", err))
 	}
-	_, err = ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, "Sheet1!A2:K").Do()
+	_, err = ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, spreadsheetRange).Do()
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get google sheet data: %w", err))
 	}
