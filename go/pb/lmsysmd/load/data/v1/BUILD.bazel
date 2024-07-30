@@ -9,11 +9,14 @@ go_library(
     deps = [
         ":data_connect",
         ":data_pb",
-        "//go/lib/context/value",
+        ""//go/pb/lmsysmd/load/model/v1:model_pb",
         "@com_connectrpc_connect//:connect",
-        "@com_github_clerk_clerk_sdk_go_v2//:clerk-sdk-go",
-        "@com_github_jackc_pgx_v5//:pgx",
         "@com_github_jackc_pgx_v5//pgxpool",
+        "@org_golang_google_api//drive/v3:drive",
+        "@org_golang_google_api//option",
+        "@org_golang_google_api//sheets/v4:sheets",
+        "@org_golang_x_oauth2//google",
+        "@org_golang_x_oauth2//jwt",
     ],
 )
 
