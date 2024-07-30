@@ -50,6 +50,10 @@ var caseInputTypeEnumMap = map[string]datav1.Data_CaseInputType{
 	"HXF":  datav1.Data_CASE_INPUT_TYPE_HISTORY_AND_FINDINGS,
 }
 
+var caseInstructionEnumMap = map[string]datav1.Data_CaseInstruction{
+	"DIFFERENTIAL_DIAGNOSIS": datav1.Data_CASE_INSTRUCTION_DIFFERENTIAL_DIAGNOSIS,
+}
+
 func (ds *DataService) BatchCreateData(
 	ctx context.Context,
 	req *connect.Request[datav1.BatchCreateDataRequest],
@@ -76,7 +80,7 @@ func (ds *DataService) BatchCreateData(
 	if err != nil {
 		return nil, err
 	}
-	_, err = ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, "Sheet1!").Do()
+	_, err = ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, "Sheet1!A2:K").Do()
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get google sheet data: %w", err))
 	}
