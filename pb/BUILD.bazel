@@ -15,6 +15,8 @@ run_binary(
         "gen/go/lmsysmd/sample/v1/samplev1connect/sample.connect.go",
         "gen/go/lmsysmd/load/data/v1/data.pb.go",
         "gen/go/lmsysmd/load/data/v1/datav1connect/data.connect.go",
+        "gen/go/lmsysmd/load/model/v1/model.pb.go",
+        "gen/go/lmsysmd/load/model/v1/modelv1connect/model.connect.go",
         "gen/ts/lmsysmd/rating/v1/rating-RatingService_connectquery.ts",
         "gen/ts/lmsysmd/rating/v1/rating_connect.ts",
         "gen/ts/lmsysmd/rating/v1/rating_pb.ts",
