@@ -78,7 +78,7 @@ func (ds *DataService) BatchCreateData(
 	}
 	_, err = ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, "Sheet1!").Do()
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get google sheet data: %s", err.Error()))
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get google sheet data: %w", err))
 	}
 
 	// TODO(sunb26): Implement parse row data and insert into database accordingly
