@@ -31,6 +31,25 @@ type DataService struct {
 
 var re = regexp.MustCompile(`https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9_-]+)\/`)
 
+var caseCategoryEnumMap = map[string]datav1.Data_CaseCategory{
+	"BR": datav1.Data_CASE_CATEGORY_BREAST,
+	"CH": datav1.Data_CASE_CATEGORY_CHEST,
+	"CV": datav1.Data_CASE_CATEGORY_CARDIOVASCULAR,
+	"GI": datav1.Data_CASE_CATEGORY_GASTROINTESTINAL,
+	"GU": datav1.Data_CASE_CATEGORY_GENITOURINARY,
+	"HN": datav1.Data_CASE_CATEGORY_HEAD_AND_NECK,
+	"MK": datav1.Data_CASE_CATEGORY_MUSCULOSKELETAL,
+	"NR": datav1.Data_CASE_CATEGORY_NEURORADIOLOGY,
+	"OB": datav1.Data_CASE_CATEGORY_OBSTETRIC,
+	"PD": datav1.Data_CASE_CATEGORY_PEDIATRIC,
+}
+
+var caseInputTypeEnumMap = map[string]datav1.Data_CaseInputType{
+	"HIST": datav1.Data_CASE_INPUT_TYPE_HISTORY,
+	"FIND": datav1.Data_CASE_INPUT_TYPE_FINDINGS,
+	"HXF":  datav1.Data_CASE_INPUT_TYPE_HISTORY_AND_FINDINGS,
+}
+
 func (ds *DataService) BatchCreateData(
 	ctx context.Context,
 	req *connect.Request[datav1.BatchCreateDataRequest],
@@ -68,37 +87,4 @@ func (ds *DataService) BatchCreateData(
 	// TODO(sunb26): Implement parse row data and insert into database accordingly
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
-}
-
-func mapEnumValues(reqValue string) string {
-	switch reqValue {
-	case "BR":
-		return "BREAST"
-	case "CH":
-		return "CHEST"
-	case "CV":
-		return "CARDIOVASCULAR"
-	case "GI":
-		return "GASTROINTESTINAL"
-	case "GU":
-		return "GENITOURINARY"
-	case "HN":
-		return "HEAD_AND_NECK"
-	case "MK":
-		return "MUSCULOSKELETAL"
-	case "NR":
-		return "NEURORADIOLOGY"
-	case "OB":
-		return "OBSTETRIC"
-	case "PD":
-		return "PEDIATRIC"
-	case "HIST":
-		return "HISTORY"
-	case "FIND":
-		return "FINDINGS"
-	case "HXF":
-		return "HISTORY_AND_FINDINGS"
-	default:
-		return "UNSPECIFIED"
-	}
 }
