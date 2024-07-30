@@ -78,7 +78,7 @@ func (ds *DataService) BatchCreateData(
 	})
 	spreadsheetId, err := parseSpreadsheetId(req.Msg.GetGoogleSheetUrl())
 	if err != nil {
-		return nil, err
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get spreadsheet id: %w", err))
 	}
 	_, err = ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, "Sheet1!A2:K").Do()
 	if err != nil {
@@ -95,5 +95,5 @@ func parseSpreadsheetId(url string) (string, error) {
 	if len(match) > 1 {
 		return match[1], nil
 	}
-	return "", connect.NewError(connect.CodeInternal, fmt.Errorf("get spreadsheet id: could not parse spreadsheet id from url"))
+	return "", fmt.Errorf("could not parse spreadsheet id from url")
 }
