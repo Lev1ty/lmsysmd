@@ -14,6 +14,7 @@ import (
 	datav1 "github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/data/v1"
 	"github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/data/v1/datav1connect"
 	modelv1 "github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/model/v1"
+	"github.com/bufbuild/protovalidate-go"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"golang.org/x/oauth2/google"
@@ -25,12 +26,14 @@ import (
 
 type DataService struct {
 	datav1connect.UnimplementedDataServiceHandler
-	dbOnce sync.Once
-	db     *pgxpool.Pool
-	gOnce  sync.Once
-	gsSrv  *sheets.Service
-	gdSrv  *drive.Service
-	gConf  *jwt.Config
+	dbOnce         sync.Once
+	db             *pgxpool.Pool
+	gOnce          sync.Once
+	gsSrv          *sheets.Service
+	gdSrv          *drive.Service
+	gConf          *jwt.Config
+	pvOnce         sync.Once
+	protoValidator *protovalidate.Validator
 }
 
 var re = regexp.MustCompile(`https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9_-]+)\/`)
@@ -118,6 +121,12 @@ func (ds *DataService) BatchCreateData(
 			panic(err)
 		}
 	})
+	ds.pvOnce.Do(func() {
+		ds.protoValidator, err = protovalidate.New()
+		if err != nil {
+			panic(err)
+		}
+	})
 	tx, err := ds.db.Begin(ctx)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("begin tx: %w", err))
@@ -127,7 +136,7 @@ func (ds *DataService) BatchCreateData(
 		// Type assert the values from the google sheet
 		exp, ok := row[0].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid exp id: id not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid exp id: id not a string on row %d", i+2))
 		}
 		expId, err := strconv.ParseUint(exp, 10, 32)
 		if err != nil {
@@ -135,15 +144,15 @@ func (ds *DataService) BatchCreateData(
 		}
 		givenModelId, ok := row[1].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid model name: name not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid model name: name not a string on row %d", i+2))
 		}
 		givenCategory, ok := row[2].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid case category: category not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid case category: category not a string on row %d", i+2))
 		}
 		strCaseId, ok := row[3].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid case id: id not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid case id: id not a string on row %d", i+2))
 		}
 		caseId, err := strconv.ParseUint(strCaseId, 10, 32)
 		if err != nil {
@@ -151,44 +160,44 @@ func (ds *DataService) BatchCreateData(
 		}
 		truth, ok := row[4].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid truth: truth not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid truth: truth not a string on row %d", i+2))
 		}
 		prompt, ok := row[5].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid prompt: prompt not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid prompt: prompt not a string on row %d", i+2))
 		}
 		givenCaseInput, ok := row[6].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid case input: input not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid case input: input not a string on row %d", i+2))
 		}
 		inputContent, ok := row[7].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid input content: content not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid input content: content not a string on row %d", i+2))
 		}
 		givenInstruction, ok := row[8].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid instruction: instruction not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid instruction: instruction not a string on row %d", i+2))
 		}
 		results, ok := row[9].(string)
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid result: result not a string on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid result: result not a string on row %d", i+2))
 		}
 		sampleChoices := strings.Split(results, ",")
 		modelId, ok := modelIdEnumMap[strings.TrimSpace(givenModelId)]
 		if !ok {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid model id: unkown model id on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid model id: unkown model id on row %d", i+2))
 		}
 		category, ok := caseCategoryEnumMap[strings.TrimSpace(givenCategory)]
 		if !ok {
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case category enum: unknown category on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case category enum: unknown category on row %d", i+2))
 		}
 		caseInputType, ok := caseInputTypeEnumMap[strings.TrimSpace(givenCaseInput)]
 		if !ok {
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case input type enum: unknown input type on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case input type enum: unknown input type on row %d", i+2))
 		}
 		instruction, ok := caseInstructionEnumMap[strings.TrimSpace(givenInstruction)]
 		if !ok {
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case instruction enum: unknown instruction on row %d", i+1))
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case instruction enum: unknown instruction on row %d", i+2))
 		}
 		// Insert into proto message for validation
 		dataMsg := &datav1.Data{
@@ -204,6 +213,10 @@ func (ds *DataService) BatchCreateData(
 			Results:          sampleChoices,
 		}
 		log.Printf("Row Proto Message: %v", dataMsg)
+		if err := ds.protoValidator.Validate(dataMsg); err != nil {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, fmt.Errorf("row %d: validate data row proto message: %w", i+2, err))
+		}
+
 	}
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
