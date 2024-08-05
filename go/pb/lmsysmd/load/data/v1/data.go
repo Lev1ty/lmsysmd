@@ -10,6 +10,7 @@ import (
 	"connectrpc.com/connect"
 	datav1 "github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/data/v1"
 	"github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/data/v1/datav1connect"
+	modelv1 "github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/model/v1"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"golang.org/x/oauth2/google"
@@ -54,6 +55,25 @@ var caseInstructionEnumMap = map[string]datav1.Data_CaseInstruction{
 	"DIFFERENTIAL_DIAGNOSIS": datav1.Data_CASE_INSTRUCTION_DIFFERENTIAL_DIAGNOSIS,
 }
 
+var modelIdEnumMap = map[string]modelv1.ModelId{
+	"GPT_3_5_TURBO_0125":                  modelv1.MODEL_ID_GPT_3_5_TURBO_0125,
+	"GPT_4_TURBO_2024_04_09":              modelv1.MODEL_ID_GPT_4_TURBO_2024_04_09,
+	"MODEL_ID_GPT_4O_2024_05_13":          modelv1.MODEL_ID_GPT_4O_2024_05_13,
+	"MODEL_ID_CLAUDE_3_OPUS_20240229":     modelv1.MODEL_ID_CLAUDE_3_OPUS_20240229,
+	"MODEL_ID_GEMINI_1_5_PRO":             modelv1.MODEL_ID_GEMINI_1_5_PRO,
+	"MODEL_ID_LLAMA_3_70B":                modelv1.MODEL_ID_LLAMA_3_70B,
+	"MODEL_ID_GEMMA_1_2B":                 modelv1.MODEL_ID_GEMMA_1_2B,
+	"MODEL_ID_PHI_3_MINI":                 modelv1.MODEL_ID_PHI_3_MINI,
+	"MODEL_ID_GEMMA_1_7B":                 modelv1.MODEL_ID_GEMMA_1_7B,
+	"MODEL_ID_PHI_3_SMALL":                modelv1.MODEL_ID_PHI_3_SMALL,
+	"MODEL_ID_LLAMA_3_8B":                 modelv1.MODEL_ID_LLAMA_3_8B,
+	"MODEL_ID_PHI_3_MEDIUM":               modelv1.MODEL_ID_PHI_3_MEDIUM,
+	"MODEL_ID_CLAUDE_3_HAIKU_20240307":    modelv1.MODEL_ID_CLAUDE_3_HAIKU_20240307,
+	"MODEL_ID_CLAUDE_3_SONNET_20240229":   modelv1.MODEL_ID_CLAUDE_3_SONNET_20240229,
+	"MODEL_ID_CLAUDE_3_5_SONNET_20240620": modelv1.MODEL_ID_CLAUDE_3_5_SONNET_20240620,
+	"MODEL_ID_YI_LARGE":                   modelv1.MODEL_ID_YI_LARGE,
+}
+
 // This variable defines the range of the spreadsheet to be read. 'A2' assumes the csv has headers in the first row. 'K' is the last column
 // and should be adjusted accordingly should a column be added or removed.
 const spreadsheetRange = "Sheet1!A2:K"
@@ -84,11 +104,10 @@ func (ds *DataService) BatchCreateData(
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get spreadsheet id: %w", err))
 	}
-	_, err = ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, spreadsheetRange).Do()
+	data, err := ds.gsSrv.Spreadsheets.Values.Get(spreadsheetId, spreadsheetRange).Do()
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get google sheet data: %w", err))
 	}
-
 	// TODO(sunb26): Implement parse row data and insert into database accordingly
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
