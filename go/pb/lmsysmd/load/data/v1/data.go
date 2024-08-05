@@ -3,8 +3,11 @@ package data
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"regexp"
+	"strconv"
+	"strings"
 	"sync"
 
 	"connectrpc.com/connect"
@@ -52,26 +55,26 @@ var caseInputTypeEnumMap = map[string]datav1.Data_CaseInputType{
 }
 
 var caseInstructionEnumMap = map[string]datav1.Data_CaseInstruction{
-	"DIFFERENTIAL_DIAGNOSIS": datav1.Data_CASE_INSTRUCTION_DIFFERENTIAL_DIAGNOSIS,
+	"DD": datav1.Data_CASE_INSTRUCTION_DIFFERENTIAL_DIAGNOSIS,
 }
 
 var modelIdEnumMap = map[string]modelv1.ModelId{
-	"GPT_3_5_TURBO_0125":                  modelv1.ModelId_MODEL_ID_GPT_3_5_TURBO_0125,
-	"GPT_4_TURBO_2024_04_09":              modelv1.ModelId_MODEL_ID_GPT_4_TURBO_2024_04_09,
-	"MODEL_ID_GPT_4O_2024_05_13":          modelv1.ModelId_MODEL_ID_GPT_4O_2024_05_13,
-	"MODEL_ID_CLAUDE_3_OPUS_20240229":     modelv1.ModelId_MODEL_ID_CLAUDE_3_OPUS_20240229,
-	"MODEL_ID_GEMINI_1_5_PRO":             modelv1.ModelId_MODEL_ID_GEMINI_1_5_PRO,
-	"MODEL_ID_LLAMA_3_70B":                modelv1.ModelId_MODEL_ID_LLAMA_3_70B,
-	"MODEL_ID_GEMMA_1_2B":                 modelv1.ModelId_MODEL_ID_GEMMA_1_2B,
-	"MODEL_ID_PHI_3_MINI":                 modelv1.ModelId_MODEL_ID_PHI_3_MINI,
-	"MODEL_ID_GEMMA_1_7B":                 modelv1.ModelId_MODEL_ID_GEMMA_1_7B,
-	"MODEL_ID_PHI_3_SMALL":                modelv1.ModelId_MODEL_ID_PHI_3_SMALL,
-	"MODEL_ID_LLAMA_3_8B":                 modelv1.ModelId_MODEL_ID_LLAMA_3_8B,
-	"MODEL_ID_PHI_3_MEDIUM":               modelv1.ModelId_MODEL_ID_PHI_3_MEDIUM,
-	"MODEL_ID_CLAUDE_3_HAIKU_20240307":    modelv1.ModelId_MODEL_ID_CLAUDE_3_HAIKU_20240307,
-	"MODEL_ID_CLAUDE_3_SONNET_20240229":   modelv1.ModelId_MODEL_ID_CLAUDE_3_SONNET_20240229,
-	"MODEL_ID_CLAUDE_3_5_SONNET_20240620": modelv1.ModelId_MODEL_ID_CLAUDE_3_5_SONNET_20240620,
-	"MODEL_ID_YI_LARGE":                   modelv1.ModelId_MODEL_ID_YI_LARGE,
+	"GPT_3_5_TURBO_0125":         modelv1.ModelId_MODEL_ID_GPT_3_5_TURBO_0125,
+	"GPT_4_TURBO_2024_04_09":     modelv1.ModelId_MODEL_ID_GPT_4_TURBO_2024_04_09,
+	"GPT_4O_2024_05_13":          modelv1.ModelId_MODEL_ID_GPT_4O_2024_05_13,
+	"CLAUDE_3_OPUS_20240229":     modelv1.ModelId_MODEL_ID_CLAUDE_3_OPUS_20240229,
+	"GEMINI_1_5_PRO":             modelv1.ModelId_MODEL_ID_GEMINI_1_5_PRO,
+	"LLAMA_3_70B":                modelv1.ModelId_MODEL_ID_LLAMA_3_70B,
+	"GEMMA_1_2B":                 modelv1.ModelId_MODEL_ID_GEMMA_1_2B,
+	"PHI_3_MINI":                 modelv1.ModelId_MODEL_ID_PHI_3_MINI,
+	"GEMMA_1_7B":                 modelv1.ModelId_MODEL_ID_GEMMA_1_7B,
+	"PHI_3_SMALL":                modelv1.ModelId_MODEL_ID_PHI_3_SMALL,
+	"LLAMA_3_8B":                 modelv1.ModelId_MODEL_ID_LLAMA_3_8B,
+	"PHI_3_MEDIUM":               modelv1.ModelId_MODEL_ID_PHI_3_MEDIUM,
+	"CLAUDE_3_HAIKU_20240307":    modelv1.ModelId_MODEL_ID_CLAUDE_3_HAIKU_20240307,
+	"CLAUDE_3_SONNET_20240229":   modelv1.ModelId_MODEL_ID_CLAUDE_3_SONNET_20240229,
+	"CLAUDE_3_5_SONNET_20240620": modelv1.ModelId_MODEL_ID_CLAUDE_3_5_SONNET_20240620,
+	"YI_LARGE":                   modelv1.ModelId_MODEL_ID_YI_LARGE,
 }
 
 // This variable defines the range of the spreadsheet to be read. 'A2' assumes the csv has headers in the first row. 'K' is the last column
@@ -109,6 +112,99 @@ func (ds *DataService) BatchCreateData(
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get google sheet data: %w", err))
 	}
 	// TODO(sunb26): Implement parse row data and insert into database accordingly
+
+	ds.dbOnce.Do(func() {
+		if ds.db, err = pgxpool.New(ctx, os.Getenv("POSTGRES_DSN")); err != nil {
+			panic(err)
+		}
+	})
+	tx, err := ds.db.Begin(ctx)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("begin tx: %w", err))
+	}
+	defer tx.Rollback(ctx)
+	for i, row := range data.Values {
+		// Type assert the values from the google sheet
+		exp, ok := row[0].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid exp id: id not a string on row %d", i+1))
+		}
+		expId, err := strconv.ParseUint(exp, 10, 32)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("convert exp id string to uint: %w", err))
+		}
+		givenModelId, ok := row[1].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid model name: name not a string on row %d", i+1))
+		}
+		givenCategory, ok := row[2].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid case category: category not a string on row %d", i+1))
+		}
+		strCaseId, ok := row[3].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid case id: id not a string on row %d", i+1))
+		}
+		caseId, err := strconv.ParseUint(strCaseId, 10, 32)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("convert case id string to uint: %w", err))
+		}
+		truth, ok := row[4].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid truth: truth not a string on row %d", i+1))
+		}
+		prompt, ok := row[5].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid prompt: prompt not a string on row %d", i+1))
+		}
+		givenCaseInput, ok := row[6].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid case input: input not a string on row %d", i+1))
+		}
+		inputContent, ok := row[7].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid input content: content not a string on row %d", i+1))
+		}
+		givenInstruction, ok := row[8].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid instruction: instruction not a string on row %d", i+1))
+		}
+		results, ok := row[9].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid result: result not a string on row %d", i+1))
+		}
+		sampleChoices := strings.Split(results, ",")
+		modelId, ok := modelIdEnumMap[strings.TrimSpace(givenModelId)]
+		if !ok {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid model id: unkown model id on row %d", i+1))
+		}
+		category, ok := caseCategoryEnumMap[strings.TrimSpace(givenCategory)]
+		if !ok {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case category enum: unknown category on row %d", i+1))
+		}
+		caseInputType, ok := caseInputTypeEnumMap[strings.TrimSpace(givenCaseInput)]
+		if !ok {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case input type enum: unknown input type on row %d", i+1))
+		}
+		instruction, ok := caseInstructionEnumMap[strings.TrimSpace(givenInstruction)]
+		if !ok {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case instruction enum: unknown instruction on row %d", i+1))
+		}
+		// Insert into proto message for validation
+		dataMsg := &datav1.Data{
+			ExperimentId:     uint32(expId),
+			ModelId:          modelId,
+			CaseCategory:     category,
+			CaseId:           uint32(caseId),
+			GroundTruth:      truth,
+			Prompt:           prompt,
+			CaseInputType:    caseInputType,
+			CaseInputContent: inputContent,
+			CaseInstruction:  instruction,
+			Results:          sampleChoices,
+		}
+		log.Printf("Row Proto Message: %v", dataMsg)
+	}
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
 }
