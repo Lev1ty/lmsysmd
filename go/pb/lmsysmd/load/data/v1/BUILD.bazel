@@ -17,6 +17,7 @@ go_library(
         "@org_golang_google_api//sheets/v4:sheets",
         "@org_golang_x_oauth2//google",
         "@org_golang_x_oauth2//jwt",
+        "@com_github_bufbuild_protovalidate_go//:protovalidate-go",
     ],
 )
 
