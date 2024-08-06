@@ -232,6 +232,15 @@ func (ds *DataService) BatchCreateData(
 		if err := tx.QueryRow(ctx, "INSERT INTO cases (caseset_id, content, create_time, truth) VALUES ($1, $2, $3, $4) RETURNING id", dataMsg.CaseId, content, t, dataMsg.GroundTruth).Scan(&cid); err != nil {
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create case for caseset %d: %w", dataMsg.CaseId, err))
 		}
+
+		// 3. Create Prompt (not sure what the id is supposed to be)
+		// TODO(sunb26): Fix the sql query once clarified what prompt id is supposed to be.
+		var promptId uint32
+		promptContent := map[string]interface{}{"messages": []map[string]string{{"role": "system", "content": dataMsg.Prompt}}}
+		if err := tx.QueryRow(ctx, "INSERT INTO prompts (content, create_time) VALUES ($1, $2) RETURNING id", promptContent, t).Scan(&promptId); err != nil {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create prompt for caseset %d: %w", dataMsg.CaseId, err))
+		}
+
 	}
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
