@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"connectrpc.com/connect"
 	datav1 "github.com/Lev1ty/lmsysmd/pbi/lmsysmd/load/data/v1"
@@ -114,7 +115,7 @@ func (ds *DataService) BatchCreateData(
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("get google sheet data: %w", err))
 	}
-	// TODO(sunb26): Implement parse row data and insert into database accordingly
+	// TODO(sunb26): Read data labels once labels have been finalized.
 
 	ds.dbOnce.Do(func() {
 		if ds.db, err = pgxpool.New(ctx, os.Getenv("POSTGRES_DSN")); err != nil {
@@ -127,6 +128,7 @@ func (ds *DataService) BatchCreateData(
 			panic(err)
 		}
 	})
+	t := time.Now()
 	tx, err := ds.db.Begin(ctx)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("begin tx: %w", err))
@@ -217,6 +219,12 @@ func (ds *DataService) BatchCreateData(
 			return nil, connect.NewError(connect.CodeFailedPrecondition, fmt.Errorf("row %d: validate data row proto message: %w", i+2, err))
 		}
 
+		// Insert into database
+
+		// 1. Create Caseset - return id
+		if _, err := tx.Exec(ctx, "INSERT INTO casesets (id, create_time) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING", dataMsg.CaseId, t); err != nil {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create caseset: %w", err))
+		}
 	}
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
