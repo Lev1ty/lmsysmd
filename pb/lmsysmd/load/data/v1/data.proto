@@ -46,7 +46,7 @@ message Data {
     (buf.validate.field).required = true,
     (buf.validate.field).enum.defined_only = true
   ];
-  uint32 case_id = 4 [(buf.validate.field).required = true];
+  uint32 caseset_id = 4 [(buf.validate.field).required = true];
   string ground_truth = 5 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 2,
