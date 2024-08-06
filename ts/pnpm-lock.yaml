@@ -120,8 +120,8 @@ importers:
   lib:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: 1.10.0
-        version: 1.10.0
+        specifier: 2.0.0
+        version: 2.0.0
       '@clerk/clerk-react':
         specifier: 5.2.7
         version: 5.2.7(react-dom@18.3.1)(react@18.3.1)
@@ -145,6 +145,10 @@ packages:
 
   /@bufbuild/protobuf@1.10.0:
     resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
+    dev: false
+
+  /@bufbuild/protobuf@2.0.0:
+    resolution: {integrity: sha512-sw2JhwJyvyL0zlhG61aDzOVryEfJg2PDZFSV7i7IdC7nAE41WuXCru3QWLGiP87At0BMzKOoKO/FqEGoKygGZQ==}
     dev: false
 
   /@clerk/clerk-react@5.2.7(react-dom@18.3.1)(react@18.3.1):

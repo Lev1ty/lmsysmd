@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@bufbuild/protobuf": "1.10.0",
+    "@bufbuild/protobuf": "2.0.0",
     "@clerk/clerk-react": "5.2.7",
     "@tanstack/react-query": "5.51.1"
   }
