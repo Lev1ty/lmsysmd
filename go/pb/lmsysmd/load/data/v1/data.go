@@ -88,6 +88,9 @@ var dataLabelEnumMap = map[string]datav1.Data_DataLabel{}
 // and should be adjusted accordingly should a column be added or removed.
 const spreadsheetRange = "Sheet1!A2:K"
 
+// This variable defines the number of expected columns in the spreadsheet. This should be adjusted accordingly should a column be added or removed.
+const spreadsheetColumnCount = 11
+
 func (ds *DataService) BatchCreateData(
 	ctx context.Context,
 	req *connect.Request[datav1.BatchCreateDataRequest],
@@ -138,6 +141,9 @@ func (ds *DataService) BatchCreateData(
 	}
 	defer tx.Rollback(ctx)
 	for i, row := range data.Values {
+		if len(row) != spreadsheetColumnCount {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid row: row does not have %d columns on row %d", spreadsheetColumnCount, i+2))
+		}
 		// Type assert the values from the google sheet
 		exp, ok := row[0].(string)
 		if !ok {
