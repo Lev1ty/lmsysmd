@@ -225,6 +225,13 @@ func (ds *DataService) BatchCreateData(
 		if _, err := tx.Exec(ctx, "INSERT INTO casesets (id, create_time) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING", dataMsg.CaseId, t); err != nil {
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create caseset: %w", err))
 		}
+
+		// 2. Create Case
+		var cid uint32
+		content := map[string]interface{}{"messages": []map[string]string{{"role": "user", "content": dataMsg.CaseInputContent}}}
+		if err := tx.QueryRow(ctx, "INSERT INTO cases (caseset_id, content, create_time, truth) VALUES ($1, $2, $3, $4) RETURNING id", dataMsg.CaseId, content, t, dataMsg.GroundTruth).Scan(&cid); err != nil {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create case for caseset %d: %w", dataMsg.CaseId, err))
+		}
 	}
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
