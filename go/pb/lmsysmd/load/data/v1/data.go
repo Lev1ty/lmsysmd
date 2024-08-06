@@ -81,6 +81,9 @@ var modelIdEnumMap = map[string]modelv1.ModelId{
 	"YI_LARGE":                   modelv1.ModelId_MODEL_ID_YI_LARGE,
 }
 
+// TODO(sunb26): Add data labels once labels have been finalized.
+var dataLabelEnumMap = map[string]datav1.Data_DataLabel{}
+
 // This variable defines the range of the spreadsheet to be read. 'A2' assumes the csv has headers in the first row. 'K' is the last column
 // and should be adjusted accordingly should a column be added or removed.
 const spreadsheetRange = "Sheet1!A2:K"
@@ -184,7 +187,12 @@ func (ds *DataService) BatchCreateData(
 		if !ok {
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid result: result not a string on row %d", i+2))
 		}
+		inputLabels, ok := row[10].(string)
+		if !ok {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid input labels: labels not a string on row %d", i+2))
+		}
 		sampleChoices := strings.Split(results, ",")
+		labels := strings.Split(inputLabels, ",")
 		modelId, ok := modelIdEnumMap[strings.TrimSpace(givenModelId)]
 		if !ok {
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("invalid model id: unkown model id on row %d", i+2))
@@ -201,6 +209,14 @@ func (ds *DataService) BatchCreateData(
 		if !ok {
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("mapping to case instruction enum: unknown instruction on row %d", i+2))
 		}
+		dataLabels := []datav1.Data_DataLabel{}
+		for _, label := range labels {
+			if l, ok := dataLabelEnumMap[strings.TrimSpace(label)]; !ok {
+				dataLabels = append(dataLabels, datav1.Data_DATA_LABEL_UNSPECIFIED)
+			} else {
+				dataLabels = append(dataLabels, l)
+			}
+		}
 		// Insert into proto message for validation
 		dataMsg := &datav1.Data{
 			ExperimentId:     uint32(expId),
@@ -213,6 +229,7 @@ func (ds *DataService) BatchCreateData(
 			CaseInputContent: inputContent,
 			CaseInstruction:  instruction,
 			Results:          sampleChoices,
+			DataLabels:       dataLabels,
 		}
 		log.Printf("Row Proto Message: %v", dataMsg)
 		if err := ds.protoValidator.Validate(dataMsg); err != nil {
@@ -233,14 +250,12 @@ func (ds *DataService) BatchCreateData(
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create case for caseset %d: %w", dataMsg.CaseId, err))
 		}
 
-		// 3. Create Prompt (not sure what the id is supposed to be)
-		// TODO(sunb26): Fix the sql query once clarified what prompt id is supposed to be.
-		var promptId uint32
+		// 3. Create Prompt
+		var promptId string
 		promptContent := map[string]interface{}{"messages": []map[string]string{{"role": "system", "content": dataMsg.Prompt}}}
 		if err := tx.QueryRow(ctx, "INSERT INTO prompts (content, create_time) VALUES ($1, $2) RETURNING id", promptContent, t).Scan(&promptId); err != nil {
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("create prompt for caseset %d: %w", dataMsg.CaseId, err))
 		}
-
 	}
 
 	return connect.NewResponse(&datav1.BatchCreateDataResponse{}), nil
