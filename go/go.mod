@@ -5,7 +5,7 @@ go 1.22.3
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.33.0-20240401165935-b983156c5e99.1
 	connectrpc.com/connect v1.16.2
-	github.com/bufbuild/protovalidate-go v0.6.2
+	github.com/bufbuild/protovalidate-go v0.7.2
 	github.com/clerk/clerk-sdk-go/v2 v2.0.4
 	github.com/dotenv-org/godotenvvault v0.6.0
 	github.com/jackc/pgx/v5 v5.6.0
