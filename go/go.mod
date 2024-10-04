@@ -11,7 +11,7 @@ require (
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/klauspost/compress v1.17.9
 	github.com/ulule/limiter/v3 v3.11.2
-	golang.org/x/net v0.26.0
+	golang.org/x/net v0.30.0
 	google.golang.org/protobuf v1.33.0
 )
 
