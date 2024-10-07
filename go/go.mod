@@ -12,7 +12,7 @@ require (
 	github.com/klauspost/compress v1.17.9
 	github.com/ulule/limiter/v3 v3.11.2
 	golang.org/x/net v0.26.0
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf v1.35.1
 )
 
 require (
