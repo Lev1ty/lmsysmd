@@ -18,8 +18,8 @@ importers:
   bin/lmsysmd:
     dependencies:
       '@clerk/clerk-react':
-        specifier: 5.2.7
-        version: 5.2.7(react-dom@18.3.1)(react@18.3.1)
+        specifier: 5.12.0
+        version: 5.12.0(react-dom@18.3.1)(react@18.3.1)
       '@clerk/themes':
         specifier: 2.1.10
         version: 2.1.10
@@ -123,8 +123,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
       '@clerk/clerk-react':
-        specifier: 5.2.7
-        version: 5.2.7(react-dom@18.3.1)(react@18.3.1)
+        specifier: 5.12.0
+        version: 5.12.0(react-dom@18.3.1)(react@18.3.1)
       '@tanstack/react-query':
         specifier: 5.51.1
         version: 5.51.1(react@18.3.1)
@@ -151,22 +151,22 @@ packages:
     resolution: {integrity: sha512-sw2JhwJyvyL0zlhG61aDzOVryEfJg2PDZFSV7i7IdC7nAE41WuXCru3QWLGiP87At0BMzKOoKO/FqEGoKygGZQ==}
     dev: false
 
-  /@clerk/clerk-react@5.2.7(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-8gPS/N0D1ooGg92lrSsAN9nKZEVE1b/nfZGtgEZX9epQ47nD+geThAC1G+mc3hABNkIODvIyecKTLbsk0K+LfA==}
+  /@clerk/clerk-react@5.12.0(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-3Lr2QazCm5R6ZLbu7wM+d5YwCElrAoX00OBWcKqjPYaWDJCCmEYN6LJbLzOTYQ8QT1J1ZIed85/lKa+q2aD1aA==}
     engines: {node: '>=18.17.0'}
     peerDependencies:
       react: '>=18 || >=19.0.0-beta'
       react-dom: '>=18 || >=19.0.0-beta'
     dependencies:
-      '@clerk/shared': 2.3.2(react-dom@18.3.1)(react@18.3.1)
-      '@clerk/types': 4.7.0
+      '@clerk/shared': 2.9.2(react-dom@18.3.1)(react@18.3.1)
+      '@clerk/types': 4.26.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       tslib: 2.4.1
     dev: false
 
-  /@clerk/shared@2.3.2(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-uOTYqSmxe41Ye8TnyPtthwLp5rrYK5Ze04bvl1SQzlIibr4qeLU2DXZOYibMnSWvIMwr45pXUHsJh8NfKKIZ2w==}
+  /@clerk/shared@2.9.2(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-vRMDj13Pv9n8Pf+f8P40AvqJ8QEq348qUxUVIf17vn9R3/toicrQOY/Q6qsrAS8KXY9+ZnyTafJa+VFK+6iEFA==}
     engines: {node: '>=18.17.0'}
     requiresBuild: true
     peerDependencies:
@@ -178,7 +178,7 @@ packages:
       react-dom:
         optional: true
     dependencies:
-      '@clerk/types': 4.7.0
+      '@clerk/types': 4.26.0
       glob-to-regexp: 0.4.1
       js-cookie: 3.0.5
       react: 18.3.1
@@ -195,15 +195,15 @@ packages:
       tslib: 2.4.1
     dev: false
 
-  /@clerk/types@4.6.1:
-    resolution: {integrity: sha512-QFeNKPYDmTJ88l5QYG0SPwbABk42wRMalW3M/wAtr+wnQxBCXyX2XRZe9h4g2rH1VF+wG4Xe56abeeD+xE4iEw==}
+  /@clerk/types@4.26.0:
+    resolution: {integrity: sha512-VGcrQz/XpCiGbpIIzKVwWw4nLorzKnIP1IAemj1xt/80ULcdEZCncwhas6PoYBBsl1W55A1SwP9B/pEs0nmkCw==}
     engines: {node: '>=18.17.0'}
     dependencies:
       csstype: 3.1.1
     dev: false
 
-  /@clerk/types@4.7.0:
-    resolution: {integrity: sha512-Gg4zEZLE7wgByMhgHMU69tkIEwfiFKNSbtRwdtAwrW+Pg0blpVpw7XuN0wHNAYFM2COrrKEUaGt8KWZmmdTFbg==}
+  /@clerk/types@4.6.1:
+    resolution: {integrity: sha512-QFeNKPYDmTJ88l5QYG0SPwbABk42wRMalW3M/wAtr+wnQxBCXyX2XRZe9h4g2rH1VF+wG4Xe56abeeD+xE4iEw==}
     engines: {node: '>=18.17.0'}
     dependencies:
       csstype: 3.1.1
