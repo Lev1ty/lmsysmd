@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@bufbuild/protobuf": "2.0.0",
-    "@clerk/clerk-react": "5.2.7",
+    "@clerk/clerk-react": "5.13.1",
     "@tanstack/react-query": "5.51.1"
   }
 }
