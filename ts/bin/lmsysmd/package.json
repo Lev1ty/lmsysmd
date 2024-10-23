@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@clerk/clerk-react": "5.2.7",
-    "@clerk/themes": "2.1.10",
+    "@clerk/themes": "2.1.39",
     "@connectrpc/connect": "1.4.0",
     "@connectrpc/connect-query": "1.4.1",
     "@connectrpc/connect-web": "1.4.0",
