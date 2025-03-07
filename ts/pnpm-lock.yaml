@@ -108,8 +108,8 @@ importers:
         specifier: 5.5.3
         version: 5.5.3
       usehooks-ts:
-        specifier: 3.1.0
-        version: 3.1.0(react@18.3.1)
+        specifier: 3.1.1
+        version: 3.1.1(react@18.3.1)
 
   env:
     dependencies:
@@ -6733,11 +6733,11 @@ packages:
       react: 18.3.1
     dev: false
 
-  /usehooks-ts@3.1.0(react@18.3.1):
-    resolution: {integrity: sha512-bBIa7yUyPhE1BCc0GmR96VU/15l/9gP1Ch5mYdLcFBaFGQsdmXkvjV0TtOqW1yUd6VjIwDunm+flSciCQXujiw==}
+  /usehooks-ts@3.1.1(react@18.3.1):
+    resolution: {integrity: sha512-I4diPp9Cq6ieSUH2wu+fDAVQO43xwtulo+fKEidHUwZPnYImbtkTjzIJYcDcJqxgmX31GVqNFURodvcgHcW0pA==}
     engines: {node: '>=16.15.0'}
     peerDependencies:
-      react: ^16.8.0  || ^17 || ^18
+      react: ^16.8.0  || ^17 || ^18 || ^19 || ^19.0.0-rc
     dependencies:
       lodash.debounce: 4.0.8
       react: 18.3.1
